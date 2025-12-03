@@ -78,15 +78,15 @@
 
 > 不依赖中间件，不引用非框架依赖包的工具代码合辑
 
-- [API版本控制](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-api-version)
-- [【文档】Mybatis代码生成器](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-generator)
-- [使用Maven插件构建Docker镜像,并推送到Harbor仓库](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-harbor)
-- [RestTemplate 调用 SonarQube的Web API 实现代码质量和安全管理](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sonar)
+- [【文档】Mybatis 代码生成器](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-generator)
+- [API 版本控制](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-api-version)
+- [RestTemplate 调用 SonarQube 的 Web API 实现代码质量和安全管理](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sonar)
+- [使用 Maven 插件构建 Docker 镜像,并推送到 Harbor 仓库](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-harbor)
+- [基于 Emqx 为客户端实现自定义登录授权](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-emqx)
+- [集成 Collabora Online 实现在线文档编辑](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-wopi)
 - [WebClient 调用 Dify API](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-dify)
-- [基于Emqx为客户端实现自定义登录授权](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-emqx)
-- [集成Collabora Online实现在线文档编辑](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-wopi)
-- [SSE流式传输协议](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sse)
+- [SSE 流式传输协议](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sse)
 - [微信公众号和企业微信开发](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-wechat)
-- [使用Filter防范XSS攻击和伪造Referrer拦截](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-xss)
+- [使用 Filter 防范 XSS 攻击和伪造 Referrer 拦截](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-xss)
 
 ---
