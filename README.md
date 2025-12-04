@@ -1,9 +1,9 @@
-# Spring Boot 2.x
+# Spring Boot 2.7
 
 ## 1. 基础
 
-- [Spring Boot入门Thymeleaf、i18n、自定义Banner、拦截器](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-stand)
-- [性能卓越的数据库连接池HikariCP](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-hikaricp)
+- [Spring Boot 入门 Thymeleaf、i18n、自定义 Banner 和拦截器](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-stand)
+- [性能卓越的数据库连接池 HikariCP](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-hikaricp)
 
 ---
 
