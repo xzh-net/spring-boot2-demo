@@ -1,0 +1,22 @@
+# 调用 Dify API
+
+### 流式调用
+POST http://127.0.0.1:8080/api/v1/chat-messages/streaming
+Authorization: Bearer 1234567890
+Api_Id: Bearer app-Wwsv2bXUgwEbbrpz2vHn5Jb1
+Content-Type: application/json
+
+{
+  "query": ""
+}
+
+
+### 阻塞式调用
+POST http://127.0.0.1:8080/api/v1/chat-messages
+Authorization: Bearer 1234567890
+Api_Id: Bearer app-Wwsv2bXUgwEbbrpz2vHn5Jb1
+Content-Type: application/json
+
+{
+  "query": "如何开发自定义组件？"
+}

@@ -1,0 +1,5 @@
+server:
+   port: 8080
+
+dify:
+   base-url: http://172.17.18.33/v1
