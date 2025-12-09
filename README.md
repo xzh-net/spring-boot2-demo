@@ -19,7 +19,7 @@
 - [整合 MongoDB 读写分离的浏览记录和商品收藏](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-mongo)
 - [【文档】整合 Redis 流控和缓存穿透解决方案](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-redis)
 - [整合 Elasticsearch 实现商品搜索和索引管理](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-elasticsearch)
-- [高性能的异步非阻塞 web 框架](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-webflux)
+- [高性能的异步非阻塞 Web 框架](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-webflux)
 - [原生 WebSocket 示例](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-websocket)
 - [JPA 操作 SQLite 数据库](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sqlite)
 
@@ -35,7 +35,7 @@
 - [整合 Shardingjdbc 实现分库分表](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sharding-jdbc)
 - [整合 HikariCP 数据库连接池监控 PostgreSQL 和 SQL 调优](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-pg-jmeter)
 - [敏感数据的保护伞，基于 Jasypt 使用 SM4 加密配置文件](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-jasypt)
-- [kaptcha 验证码](https://github.com/xzh-net/spring-boot2/tree/main/spring-boot-kaptcha)
+- [Kaptcha 验证码](https://github.com/xzh-net/spring-boot2/tree/main/spring-boot-kaptcha)
 - [Zipkin 实现分布式全链路监控](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-zipkin)
 - [多数据源自动切换和动态数据源手动切换](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-datasource)
 - [替代 Hystrix 和 Sentinel 的轻量级熔断器 Resilience4j](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-resilience4j)
