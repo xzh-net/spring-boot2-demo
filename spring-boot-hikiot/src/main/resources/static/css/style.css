@@ -1,0 +1,260 @@
+* {
+    box-sizing: border-box; /* 统一盒模型 */
+}
+html{
+    width: 100%;
+    height: 100%;
+}
+body{
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+/* 滑块样式 */
+::-webkit-scrollbar-thumb{
+    background-color: #c8c9cc; 
+    border-radius: 5px;
+}
+/* 滚动条轨道样式 */
+::-webkit-scrollbar-track{
+    background-color: #fcfcfc;
+    border-radius: 5px;
+}
+.clientSdk{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+.left{
+    width: 624px;
+    height: 100%;
+    padding: 24px 0 0 24px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+.flexClass{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.border-box{
+    width: 600px;
+    box-sizing: border-box;
+    padding: 24px;
+    background-color: #fafafa;
+    margin-bottom: 16px;
+}
+.bg-box{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 24px;
+    background-color: #fafafa;
+    margin-right: 16px;
+}
+.bg-box:nth-child(1){
+    width: 180px;
+}
+.bg-box:nth-child(2){
+    width: 410px;
+}
+.bg-box:nth-child(3){
+    flex: 1;
+}
+h3 {
+    text-align: center;
+    margin: 0;
+    margin-bottom: 16px;
+}
+.form-group{
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+label{
+    display: inline-block;
+    box-sizing: border-box;
+    margin-bottom: .5rem;
+}
+.long-label{
+    width: 250px;
+}
+.short-label{
+    width: 125px;
+}
+.form-control {
+    display: block;
+    box-sizing: border-box;
+    width: 400px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #495057;
+}
+.right{
+    margin: 24px 0 0;
+    padding: 0 24px;
+    margin-left: 0;
+    width: calc(100% - 624px);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.operation-box{
+    display: flex;
+    margin-top: 16px;
+}
+.btnList{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+.btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+}
+.btn> .el-button{
+    padding: 12px 0 !important;
+}
+.btn:last-child {
+    margin-right: 0; /* 最后一个盒子去除右边间距 */
+}
+.right-item{
+    display: flex;
+    align-items: center; 
+    margin-bottom:16px;
+}
+.model-input{
+    width:400px;
+}
+.el-button {
+    margin: 0 10px 12px 0;
+}
+.el-input{
+    width: 100% !important;
+}
+.el-input--small{
+    width: 140px !important;
+}
+.el-date-editor .el-range-separator{
+    width: 10% !important;
+}
+.form-textarea{
+    width: 100%;
+    height: 100%;
+}
+.sliderStyle{
+    width:400px;
+}
+.videoBox{
+    width: 100%;
+    position: relative;
+}
+.video-switch {
+    width: 100%;
+    height: 48px;
+    background: #333333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.video-switch-tab {
+    height: 48px;
+    margin: 0 auto;
+    transition: transform 0.3s;
+    position: relative;
+    cursor: pointer;
+}
+
+.video-switch-tab-line {
+    position: absolute;
+    width: 88px;
+    top: 0;
+    height: 3px;
+    background-color: #e72528;
+    z-index: 1;
+    transition: 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.video-switch-tab-btn {
+    font-size: 12px;
+    font-weight: 801;
+    float: left;
+    font-family: "MicrosoftYaHei-Bold";
+    line-height: 48px;
+    color: #fff;
+    opacity: 0.6;
+    width: 88px;
+    box-sizing: content-box;
+    text-align: center;
+}
+.speed{
+    padding: 5px;
+}
+
+#playWnd {
+    background: #333333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.empty{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 8px;
+    font-weight: 600;
+}
+.tab-active {
+    opacity: 1;
+}
+
+.input-group {
+    /* width: 550px; */
+    display: flex;
+    flex-direction: column;
+    height: 250px;
+}
+
+body {
+    position: relative;
+}
+
+.tips {
+    position: fixed;
+    left: 0;
+    z-index: 100;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity .5s;
+}
+
+.fade-enter,
+.fade-leave-to
+
+/* .fade-leave-active below version 2.1.8 */
+{
+    opacity: 0;
+}

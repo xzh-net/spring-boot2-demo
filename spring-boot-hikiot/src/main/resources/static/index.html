@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+		<link rel="stylesheet" href="/css/style.css" />
+        <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+        <script src="/js/vue.min.js"></script>
+        <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+        <script src="/js/HikOpenVideoSDK-1.0.0.min.js"></script>
+	</head>
+
+	<body>
+		<div id="app" class="clientSdk" element-loading-text="服务连接中">
+            <div class="left">
+                <div class="flexClass">
+                    <el-button 
+                        :disabled="isConnectWs"
+                        type="primary"
+                        style="width: 100%;margin-bottom: 20px"
+                        @click="startService"
+                    >
+                        连接服务
+                    </el-button>
+                </div>
+                <div class="flexClass">
+                    <el-button 
+                        :disabled="!isConnectWs||!initSuccess"
+                        type="primary"
+                        style="width: 100%;margin-bottom: 20px"
+                        @click="showWndMessage"
+                    >
+                        显示
+                    </el-button>
+                    <el-button 
+                        :disabled="!isConnectWs||!initSuccess"
+                        type="primary"
+                        style="width: 100%;margin-bottom: 20px"
+                        @click="hideWndMessage"
+                    >
+                        隐藏
+                    </el-button>
+                </div>
+                <div class="border-box">
+                    <h3 class="title">设置数据加密配置</h3>
+                    <div class="form-group">
+                        <label for="AppKey" class="short-label">
+                            AppKey：
+                        </label>
+                        <el-input
+                            v-model="AppKey"
+                            class="form-control"
+                            placeholder="Enter AppKey"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="AppSecret" class="short-label">
+                            AppSecret：
+                        </label>
+                        <el-input
+                            v-model="AppSecret"
+                            class="form-control"
+                            placeholder="Enter AppSecret"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="IsScret" class="short-label">
+                            IsScret：
+                        </label>
+                        <el-switch
+                            v-model="IsScret"
+                            class="form-control"
+                            style="width: 100%;"
+                        />
+                    </div>
+                    <el-button
+                    :disabled="!isConnectWs"
+                        type="primary"
+                        style="width: 100%;"
+                        @click="initSecret"
+                    >
+                    设置数据加密配置
+                    </el-button>
+                </div>
+                <div class="border-box">
+                    <h3 class="title">初始化窗口</h3>
+                    <div class="form-group">
+                        <label for="AppAccessToken" class="long-label">
+                            AppAccessToken：
+                        </label>
+                        <el-input
+                            v-model="AppAccessToken"
+                            class="form-control"
+                            placeholder="Enter AppAccessToken"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="UserAccessToken" class="long-label">
+                            UserAccessToken：
+                        </label>
+                        <el-input
+                            v-model="UserAccessToken"
+                            class="form-control"
+                            placeholder="Enter UserAccessToken"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="EzvizData" class="long-label">
+                            EzvizData：
+                        </label>
+                        <el-input
+                            v-model="EzvizData"
+                            class="form-control"
+                            placeholder="Enter EzvizData"
+                        />
+                    </div>
+                    <el-button
+                        :disabled="!isSetSecret"
+                        type="primary"
+                        style="width: 100%;"
+                        @click="initWndParam"
+                    >
+                        初始化窗口
+                    </el-button>
+                </div>
+                <div class="border-box">
+                    <h3 class="title">初始化资源</h3>
+                    <div class="form-group">
+                        <label for="resourcesData" class="short-label">
+                            资源：
+                        </label>
+                        <el-input
+                            type="textarea"
+                            size="medium"
+                            v-model="resourcesData"
+                            class="form-control"
+                            placeholder="Enter 资源"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="tokensData" class="short-label">
+                            设备Token：
+                        </label>
+                        <el-input
+                            type="textarea"
+                            size="medium"
+                            v-model="tokensData"
+                            class="form-control"
+                            placeholder="Enter 设备Token"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="capacitysData" class="short-label">
+                            能力集：
+                        </label>
+                        <el-input
+                            type="textarea"
+                            size="medium"
+                            v-model="capacitysData"
+                            class="form-control"
+                            placeholder="Enter 能力集"
+                        />
+                    </div>
+                    <el-button
+                        :disabled="!isConnectWs"
+                        type="primary"
+                        style="width: 100%;"
+                        @click="initResource"
+                    >
+                        初始化资源
+                    </el-button>
+                </div>
+                <div class="border-box">
+                    <h3 class="title">输入参数</h3>
+                    <div class="form-group">
+                        <label for="deviceSerial" class="short-label">
+                            设备序列号：
+                        </label>
+                        <el-input
+                            v-model="deviceSerial"
+                            class="form-control"
+                            placeholder="Enter 设备序列号"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="channelNo" class="short-label">
+                            通道号：
+                        </label>
+                        <el-input
+                            v-model="channelNo"
+                            class="form-control"
+                            placeholder="Enter 通道号"
+                        />
+                    </div>
+                    <div class="form-group" v-if="switchVideo===1">
+                        <label for="dateValue" class="short-label">
+                            回放时间：
+                        </label>
+                        <el-date-picker
+                            v-model="dateValue"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            style="width: 180px !important;"
+                            placeholder="选择日期">
+                        </el-date-picker>
+                        <el-time-picker
+                            is-range
+                            v-model="timeValue"
+                            value-format="HH:mm:ss"
+                            style="width: 345px !important;margin-left: 16px;"
+                            range-separator="至"
+                            start-placeholder="开始时间"
+                            end-placeholder="结束时间"
+                            placeholder="选择时间范围">
+                        </el-time-picker>
+                    </div>
+                    <div class="form-group" v-if="switchVideo===1">
+                        <label for="playbackType" class="short-label">
+                            录像设置：
+                        </label>
+                        <el-radio-group v-model="playbackType" style="width: 100%;" @change="radioChange">
+                            <el-radio :label="1">本地录像</el-radio>
+                            <el-radio :label="2">云录像</el-radio>
+                        </el-radio-group>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataObj" class="short-label">
+                            批量数据：
+                        </label>
+                        <el-input
+                            v-model="dataObj"
+                            class="form-control"
+                            type="textarea"
+                            size="medium"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="right">
+                <div class="videoBox" >
+                    <div class="video-switch">
+                        <div class="video-switch-tab">
+                            <div
+                                class="video-switch-tab-line" 
+                                :style="switchVideo!==0?'right: 0':'left: 0'"
+                            ></div>
+                            <div
+                                class="video-switch-tab-btn"
+                                :class="{'tab-active':(switchVideo===0?true : false )}"
+                                @click="switchTo(0)"
+                            >
+                                实时预览
+                            </div>
+                            <div
+                                class="video-switch-tab-btn"
+                                :class="{'tab-active':(switchVideo===1?true : false )}"
+                                @click="switchTo(1)"
+                            >
+                                录像回放
+                            </div>
+                        </div>
+                    </div>
+                    <div ref="playWnd" v-loading="isLoadingMask" class="playWnd" id="playWnd" style="width: 100%; height: 500px;background: #333333;" >
+                        <div v-if="isConnectWs&&initSuccess&&isWndShow" class="empty">{{ !supportedSystem?'不支持当前操作系统':!supportedBrowser?'暂不支持当前浏览器请下载并安装Chrome浏览器':isMaxWnd?'为了提供最佳的视频体验，海康互联仅支持在单一浏览器页面中开启并使用视频功能':'请先安装视频播放组件' }}</div>
+                    </div>
+                </div>
+                <div  class="operation-box">
+                    <div class="bg-box">
+                        <h3 class="title">播放</h3>
+                        <div class="btnList">
+                            <div v-for="(item,index) in playList" :key="index" class="btn">
+                                <el-button
+                                    type="primary"
+                                    style="width: 120px;"
+                                    v-if="((index===0||index===1)&&switchVideo===0)||((index===2||index===3)&&switchVideo===1)"
+                                    
+                                    @click="playVideo(item)"
+                                >
+                                    {{ item.label }}
+                                </el-button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-box">
+                        <h3 class="title">云台</h3>
+                        <div class="btnList">
+                            <div v-for="(item,index) in cloudBtnList" :key="index" class="btn">
+                                <el-button
+                                    type="primary"
+                                    style="width: 80px;"
+                                    :disabled="!isConnectWs||!initSuccess||!isWndShow||switchVideo===1"
+                                    @mousedown.native="cloudControl('start',item.value)"
+                                    @mouseup.native="cloudControl('stop',item.value)"
+                                    @click="cloudControlAuto(item)"
+                                >
+                                    {{ isAuto&&item.value===16?'停止':item.label }}
+                                </el-button>
+                            </div>
+                            <div class="speed">
+                                <span style="font-size:14px">速度调节：</span>
+                                <el-input-number 
+                                    v-model="speed"
+                                    :disabled="!isAuto"
+                                    :min="0" 
+                                    :max="2" 
+                                    size="medium" 
+                                    style="width: 100px;" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-box">
+                        <h3 class="title">消息回调</h3>
+                        <el-input
+                            v-model="callbackObj"
+                            class="form-control"
+                            type="textarea"
+                            style="width: 100%;height: 100%;"
+                            size="medium"
+                            rows="9"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            new Vue({
+                el: '#app',
+                data() {
+                    return {
+                        dialogVisible:false,
+                        direction:'ltr',
+                        drawer:false,
+                        //设置数据加密配置
+                        IsScret: false,
+                        AppKey:'',
+                        AppSecret:'',
+                        //初始化窗口
+                        AppAccessToken: '', //应用授权凭证
+                        UserAccessToken: '', //用户授权凭证
+                        EzvizData: '',
+                        ezvizAddr: 'https://open.ys7.com', //固定填：https://open.ys7.com
+                        authAddr: 'https://auth.ys7.com', //固定填：https://auth.ys7.com
+                        openAddr: 'https://open.ys7.com', //固定填：https://open.ys7.com
+                        //初始化资源
+                        resourcesData: '', //资源详情
+                        tokensData: '', //单个资源对应的权限信息
+                        capacitysData: '', //能力集
+                        //交互字段
+                        supportedSystem: false, //是否支持当前操作系统
+                        supportedBrowser: false, //是否支持当前浏览器
+                        isMaxWnd: false, //是否为最大窗口
+                        isLoadingMask: false, //连接服务时遮罩
+                        //插件状态字段
+                        isConnectWs: false, //是否连接websocket
+                        isSetSecret: false, //是否设置过密钥
+                        initSuccess: false, //插件初始化成功
+                        isWndShow: false, //窗口是否显示
+                        // 调试信息
+                        switchVideo: 0, // 0-实时预览，1-录像回放
+                        playWndInfo:{},//窗口位置信息
+                        scrollTimeout: null, //滚动条定时器
+                        resizeTimeout: null, //窗口大小定时器
+                        scrollBarWidth: 0, //滚动条宽度
+                        scrollBarHeight: 0, //滚动条高度
+                        iVCTimeStart: 0,
+                        iVCTimeEnd: 0, 
+                        iUpdateParentWndTimer: null,
+                        //功能入参
+                        deviceSerial: '', //设备序列号
+                        channelNo: null, //通道号
+                        dataObj: null, //批量数据
+                        callbackObj: null, //回调消息
+                        playbackType: 1, //回放类型 1-本地录像，2-云回放
+                        timeValue: '', //时间值
+                        dateValue: '', //日期值
+                        isAuto: false,
+                        cloudBtnList:[
+                            {
+                                label: '左上',
+                                value: 4
+                            },
+                            {
+                                label: '上',
+                                value: 0
+                            },
+                            {
+                                label: '右上',
+                                value: 6
+                            },
+                            {
+                                label: '焦距变小',
+                                value: 9
+                            },
+                            {
+                                label: '焦距变大',
+                                value: 8
+                            },
+                            {
+                                label: '左',
+                                value: 2
+                            },
+                            {
+                                label: '自动',
+                                value: 16
+                            },
+                            {
+                                label: '右',
+                                value: 3
+                            },
+                            {
+                                label: '焦点前调',
+                                value: 10
+                            },
+                            {
+                                label: '焦点后调',
+                                value: 11
+                            },
+                            {
+                                label: '左下',
+                                value: 5
+                            },
+                            {
+                                label: '下',
+                                value: 1
+                            },
+                            {
+                                label: '右下',
+                                value: 7
+                            },
+                        ],
+                        needStopHandle:false,//是否停止处理
+                        playList:[
+                            {
+                                label: '单个预览',
+                                value: 'singlePreview',
+                            },
+                            {
+                                label: '批量预览',
+                                value: 'mulPreview',
+                            },
+                            {
+                                label: '单个回放',
+                                value: 'singlePlayback',
+                            },
+                            {
+                                label: '批量回放',
+                                value: 'mulPlayback',
+                            },
+                        ],
+                        speed: 1
+                    };
+                },
+                mounted: function () {
+                    // 获取容器信息
+                    this.getContainerInfo();
+                    // 监听页面大小变化
+                    window.addEventListener('resize', this.handleResize);
+                    // 监听页面滚动
+                    window.addEventListener('scroll', this.handleScroll);
+                },
+                created() {
+                    // 监听websocket消息
+                    window.addEventListener('websocket-message', this.handleWebSocketMessage);
+                    // 监听页面可见性变化
+                    document.addEventListener("visibilitychange", this.handleVisibilityChange);
+                },
+                beforeDestroy() {
+                    window.removeEventListener('websocket-message', this.handleWebSocketMessage);
+                    document.removeEventListener("visibilitychange", this.handleVisibilityChange);
+                },
+                beforeUnmount() {
+                    window.removeEventListener('resize', this.handleResize);
+                    window.removeEventListener('scroll', this.handleScroll);
+                },
+                methods: {
+                    // 连接服务
+                    startService(){
+                        this.isLoadingMask = true;
+                        this.wsClient = new window.WebSocketClient();
+                        this.wsClient.connect().then((response) => {
+                            if(response.code===0&&response.message==='connect success'){
+                                this.isConnectWs = true; // 连接成功
+                                // this.reconnect();
+                            }
+                            this.isLoadingMask = false;
+                        }).catch((err)=>{
+                            console.log(err,'err');
+                            if(err.code===999){
+                                this.supportedBrowser = false;
+                            }else if(err.code===888){
+                                this.supportedSystem = false;
+                            }else if(err.code===6){
+                                this.isMaxWnd = true;
+                            }
+                            this.isLoadingMask = false;
+                            this.isConnectWs = false;
+                        });
+                    },
+                    // 服务端消息处理
+                    handleWebSocketMessage(event){
+                        const data = event;
+                        console.log('websocket-message---服务端消息:', data);
+                        this.callbackObj = JSON.stringify(data.detail);
+                        const detailInfo= data.detail||null;
+                        if(detailInfo.cmd==='disconnect'){
+                            this.isConnectWs = false;
+                            this.initSuccess = false;
+                            this.isLoadingMask = false;
+                        }else if(detailInfo.cmd==='connectToServer'){
+                            this.isConnectWs = true
+                        }else if(detailInfo.cmd==='msgTips'){
+                            console.log('插件返回提示信息：',detailInfo.data);
+                        }else if(detailInfo.cmd==='playWndAlreadyMax'){
+                            console.log('网页端不支持该窗格分割')
+                        }
+                    },
+                    // 设置加密配置
+                    initSecret(){
+                        let data = {
+                            bSecret: this.IsScret,
+                            openAppkey: this.AppKey,
+                            openAppSecret: this.AppSecret,
+                        }
+                        this.wsClient.setSecretConfigInfo(data, (response) => {
+                            this.isSetSecret = true;
+                        });
+                    },
+                    // 初始化窗口
+                    initWndParam(){
+                        let data = {
+                            ezAccessData: this.EzvizData,
+                            appAccessToken: this.AppAccessToken,
+                            userAccessToken: this.UserAccessToken,
+                            ezvizAddr: this.ezvizAddr,
+                            authAddr: this.authAddr,
+                            authAddr: this.authAddr,
+                        };
+                        this.wsClient.initWndParam(data, (response) => { // 初始化参数
+                            this.initSuccess = true;
+                            let webTitle = this.wsClient.guid(16);
+                            this.wsClient.setParentWnd({ // 设置父窗口
+                                webTitle: webTitle
+                            },(res)=>{
+                                const data = {
+                                    rect:{
+                                        ...this.playWndInfo 
+                                    }
+                                };
+                                this.wsClient.setWndGeometry(data); // 设置插件窗口位置
+                            });
+                        });
+                    },
+                    // 窗口所在坐标
+                    getContainerInfo() {
+                        this.$nextTick(() => {
+                            const rect = this.$refs.playWnd && this.$refs.playWnd.getBoundingClientRect();
+                            this.playWndWidth = rect.width;
+                            this.playWndHeight = rect.height;
+                            this.playWndTop = rect.top;
+                            this.playWndLeft = rect.left;
+                            const info = {
+                                top: this.playWndTop,
+                                left: this.playWndLeft,
+                                width: this.playWndWidth,
+                                height: this.playWndHeight,
+                            };
+                            this.playWndInfo = info;
+                        });
+                    },
+                    // 页面变化执行事件
+                    handleResize() {
+                        this.resizeTimeout = null;
+                        this.resizeTimeout = setTimeout(() => {
+                            this.getContainerInfo();
+                            this.hasScrollbar();
+                            this.resizeTimeout = null;
+                        }, 300);
+                    },
+                    // 页面滚动执行事件
+                    handleScroll(){
+                        this.scrollTimeout = null;
+                        this.scrollTimeout = setTimeout(() => {
+                            this.isScrolling = false;
+                            this.getContainerInfo();
+                            this.setPosition();
+                            this.scrollTimeout = null;
+                        }, 300);
+                    },
+                    // 设置窗口位置
+                    setPosition(){
+                        let data = {
+                            rect: {
+                                ...this.playWndInfo
+                            }
+                        };
+                        this.wsClient.setWndGeometry(data, () => {
+                            
+                        });
+                    },
+                    // 是否切割滚动条
+                    hasScrollbar() {
+                        // 是否有垂直方向滚动条
+                        if(document.documentElement.scrollHeight > document.documentElement.clientHeight){
+                            this.scrollBarHeight = 6;
+                        }else{
+                            this.scrollBarHeight = 0;
+                        }
+                        // 是否有水平方向滚动条
+                        if(document.documentElement.scrollWidth > document.documentElement.clientWidth){
+                            this.scrollBarWidth = 6;                         
+                        }else{
+                            this.scrollBarWidth = 0;
+                        }
+                        if(this.isConnectWs){
+                            this.resetWndPos();
+                        }
+                    },
+                    // 切割掉滚动条区域
+                    resetWndPos(){
+                        let param = {
+                            verScrollRect:{
+                                width: this.scrollBarWidth
+                            },
+                            horScrollRect: {
+                                height: this.scrollBarHeight
+                            }
+                        };
+                        this.wsClient.setCuttingArea(param, (response) => {
+                            this.setPosition();
+                        });
+                    },
+                    // 窗口是否需要隐藏
+                    handleVisibilityChange() {
+                        // 如果不是 macOS，检查 document.hidden 状态
+                        if (document.hidden) {
+                        // 记录隐藏窗口的起始时间，并隐藏窗口
+                            this.iVCTimeStart = (new Date).getTime();
+                            this.hideWndMessage();
+                        } else {
+                        // 记录隐藏窗口的结束时间
+                            this.iVCTimeEnd = (new Date).getTime();
+                            // 如果存在定时器，先清除定时器
+                            if (this.iUpdateParentWndTimer > 0) {
+                                clearTimeout(this.iUpdateParentWndTimer);
+                                this.iUpdateParentWndTimer = -1;
+                            }
+                            // 如果隐藏时间小于 100ms，设置一个定时器
+                            if (this.iVCTimeEnd - this.iVCTimeStart < 100) {
+                                this.iUpdateParentWndTimer = setTimeout(()=> {
+                                    this.updateParentWnd();
+                                    this.hasScrollbar();
+                                }, 100);
+                                this.showWndMessage();
+                            } else {
+                                this.showWndMessage();
+                            }
+                        }
+                    },
+                    // 更新父窗口
+                    updateParentWnd(){
+                        this.wsClient.updateParentWnd({}, (response) => {
+                            this.setPosition();
+                        });
+                    },
+                    // 显示
+                    showWndMessage(){
+                        this.wsClient.showWnd({}, (response) => {
+                            if(this.switchVideo===1){
+                                this.wsClient.setPlayWindowType({
+                                    windowMode: 'playback'
+                                }, (response) => {
+                                    
+                                });
+                            }
+                            this.isWndShow = true
+                        });
+                    },
+                    // 隐藏
+                    hideWndMessage(){
+                        this.wsClient.hideWnd();
+                    },
+                    // 初始化资源
+                    initResource(){
+                        let data = {
+                            resourcesData: this.resourcesData,
+                            tokensData: this.tokensData,
+                            capacitysData: this.capacitysData,
+                        }
+                        this.wsClient.initResource(data, ((response)=>{
+                            // this.initResourcesSuccess = true;
+                        }));
+                    },
+                    // 模式切换
+                    switchTo(val){
+                        this.switchVideo = val*1;
+                        if(val===0){
+                            this.wsClient.setPlayWindowType({
+                                windowMode: 'preview'
+                            }, (response) => {
+                                
+                            });
+                        }else{
+                            this.wsClient.setPlayWindowType({
+                                windowMode: 'playback'
+                            }, (response) => {
+                                
+                            });
+                        }
+                    },
+                    // 录像设置切换
+                    radioChange(){
+                        this.singlePlayback()
+                    },
+                    // 时间设置切换
+                    timeChange(){
+                        this.singlePlayback()
+                    },
+                    // 播放
+                    playVideo(obj){
+                        switch (obj.value) {
+                            case 'singlePreview':
+                                this.singlePreview()
+                                break;
+                            case 'mulPreview':
+                                this.multiPreview()
+                                break;
+                            case 'singlePlayback':
+                                this.singlePlayback()
+                                break;
+                            case 'mulPlayback':
+                                this.multiPlayback()
+                                break;
+                        }
+                    },
+                    // 单个预览
+                    singlePreview(){
+                        this.wsClient.startPreview(1,{
+                            deviceSerial: this.deviceSerial,
+                            channelNo: this.channelNo*1
+                        }, (response) => {
+                        });
+                    },
+                    // 批量预览
+                    multiPreview(){
+                        this.wsClient.batchPreview(1,JSON.parse(this.dataObj).data, (response) => {
+                        });
+                    },
+                    // 单个回放
+                    singlePlayback(){
+                        let startTime = `${this.dateValue} ${this.timeValue[0]}`;
+                        let endTime = `${this.dateValue} ${this.timeValue[1]}`;
+                        let data = {
+                            deviceSerial: this.deviceSerial,
+                            channelNo: this.channelNo*1,
+                            startTime: startTime,
+                            endTime: endTime,
+                            wndNo: -1,
+                            searchType: this.playbackType
+                        }
+                        this.wsClient.startPlayback(1,data, () => {
+                        });
+                    },
+                    // 批量回放
+                    multiPlayback(){
+                        let startTime = `${this.dateValue} ${this.timeValue[0]}`;
+                        let endTime = `${this.dateValue} ${this.timeValue[1]}`;
+                        this.wsClient.batchPlayback(1,{
+                            startTime: startTime,
+                            endTime: endTime,
+                            searchType: this.playbackType
+                        },JSON.parse(this.dataObj).data, () => {
+                        });
+                    },
+                    // 云台
+                    cloudControl(cmdType,direction){
+                        console.log(cmdType,direction);
+                        
+                        if(direction===16){
+                            return;
+                        }
+                        let data = {
+                            cmdType: cmdType,
+                            deviceSerial: this.deviceSerial,
+                            channelNo: this.channelNo*1,
+                            direction: direction,
+                            speed: this.speed,
+                        }
+                        if (cmdType==='stop') {
+                            setTimeout(() => {
+                                if (this.needStopHandle) {
+                                    this.wsClient.ptzControl(1,data, (response) => {});
+                                }else{
+                                    this.needStopHandle = true;
+                                }
+                            }, 500);
+                        }else{
+                            this.wsClient.ptzControl(1,data, (response) => {
+                                if (response.code!==0) {
+                                    this.needStopHandle = false;
+                                }else{
+                                    this.needStopHandle = true;
+                                }
+                            });
+                        }
+                    },
+                    cloudControlAuto(obj){
+                        if(obj.value!==16){
+                            return;
+                        }
+                        this.isAuto = !this.isAuto;
+                        let data = {
+                            cmdType: this.isAuto?'start':'stop',
+                            deviceSerial: this.deviceSerial,
+                            channelNo: this.channelNo*1,
+                            direction: obj.value,
+                        }
+                        if(this.isAuto){
+                            data.speed = 1;
+                        }
+                        this.wsClient.ptzControl(1,data, () => {
+                        });
+                    }
+                },
+            });
+        </script>
+	</body>
+</html>
