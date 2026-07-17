@@ -84,7 +84,6 @@
 - [API 版本控制](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-api-version)
 - [SSE 流式传输协议](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sse)
 - [RestTemplate 调用 SonarQube 的 Web API 实现代码质量和安全管理](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sonar)
-
 - [基于 Emqx 为客户端实现自定义登录授权](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-emqx)
 - [集成 Collabora Online 实现在线文档编辑](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-wopi)
 - [WebClient 调用 Dify API](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-dify)
