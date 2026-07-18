@@ -1,0 +1,22 @@
+# 萤石测试接口
+
+### 获取AccessToken
+GET http://127.0.0.1:8080/ys7/token
+
+### 查询设备列表（默认参数，返回所有设备）
+GET http://127.0.0.1:8080/ys7/device/list
+
+### 查询设备列表（指定分页参数）
+GET http://127.0.0.1:8080/ys7/device/list?pageStart=0&pageSize=20
+
+### 获取设备播放地址（仅设备序列号）
+GET http://127.0.0.1:8080/ys7/device/live/address?deviceSerial=GC5450201
+
+### 获取设备播放地址（指定通道号和协议）
+GET http://127.0.0.1:8080/ys7/device/live/address?deviceSerial=GC5450201&channelNo=1&protocol=2
+
+### 获取设备播放地址（指定过期时间和清晰度）
+GET http://127.0.0.1:8080/ys7/device/live/address?deviceSerial=GC5450201&channelNo=1&expireTime=3600&quality=1
+
+### 获取设备本地录像回放地址
+GET http://127.0.0.1:8080/ys7/device/live/address?deviceSerial=GC5450201&channelNo=1&type=2&protocol=4&startTime=2024-01-01%2000:00:00&stopTime=2024-01-01%2023:59:59
