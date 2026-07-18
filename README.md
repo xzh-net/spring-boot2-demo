@@ -89,5 +89,5 @@
 - [WebClient 调用 Dify API](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-dify)
 - [微信公众号和企业微信开发](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-wechat)
 - [海康互联开放平台在线视频取流](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-hikiot)
-
+- [萤石开放平台 OPEN API 在线视频取流](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-ys7)
 ---
