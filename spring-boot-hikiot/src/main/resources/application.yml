@@ -2,8 +2,8 @@ server:
    port: 8080
 
 hikiot:
-  APP_KEY: 2076543337980309596
-  APP_SECRET: U0RU6iq5L5Xa97pnjatxstK5xo+v0M6cX3/84a0oKN7NDweAR1qXXAXucD9jAVdN25EOkLDJD7j6umuuNepQdo93QYjq/vzlJxpMXB2OCJNhzNatQsNy5FfekVqdaScWozpw8BiPDAgMBAAECgYBNDtNyB6np4onZNZr/5WAn9HmG6+TgDZVMZCpe4J9Q0nliPzQdfr6p+801CjPduHhMbqbQvAPJ4o8yDlV5RpqOu/urlPzr6z2qphQRFZlcEEYxWDeRzAJGhspBurlMhMZYQH9Knrhm2uZeH4ijq1En2qUcRGfLKfx2It9o1CfAwQJBAN/BmEApBK0U8pDUVOi9z6bD0rVrw2sI7viCJhM6dlHiPJmAIp6Xj0W4Ren5JopOy0YkcLvWFWli41Qlpl/Uz7ECQQC821AEDcfXIH8iFfbaAL0BH6F0u7u1w6TEmI0BZLCuTb2wmNFicCaLzmG4Uruqx5dqs52OHUQwzOjuE4zQ9VuzAkAjYn4tR09R/8oMVUfINpwsBzO/NPeGabdA3XQf/lLPyDNFIxpWcilaITYNNjV+Ec/bm8+oJMbmD5lbqUiSRxlBAkEAmkMaDPWksthcgF8oj9HikLRhkZR3M3VndR6WrvisSPQ/aayp+5pYIgKmV4VcvZbi28lzfM3zEVmPOkjF0TlZeQJAZwt8mla5fn1xal/ghoaOhRV/pblr3T7KEGfKsYU8V2IzaRj3ss5eyi/j3YDMUnIvG7Tuq9W8dOzKa0RzW5w03g==
-  USER_NAME: 13998417419
-  PASS_WORD: 123456
-  REDIRECT_URL: http://120.71.147.122/agriculture/hikiot/callback
+  app-key: 2076543337980309596
+  app-secret: ss5eyi/j3YDMUnIvG7Tuq9W8dOzKa0RzW5w03g==
+  user-name: 13998417419
+  password: 123456
+  redirect-url: http://mobile.njher.com/agriculture/hikiot/callback

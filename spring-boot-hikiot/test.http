@@ -1,0 +1,32 @@
+# 海康互联测试接口
+
+### 获取应用Token
+GET http://127.0.0.1:8080/hikiot/token
+
+### 刷新应用Token
+GET http://127.0.0.1:8080/hikiot/token/refresh?appAccessToken=at-y0DshS6BWcX7qPBHVAReC8SWXtLYLDF36SyTKFSK&refreshAppToken=art-l9RBrXfpOsvt4b0UoijV3xwkJwp4Bgi0ksZFKgtV
+
+### 获取用户Token
+GET http://127.0.0.1:8080/hikiot/user/token
+
+### 刷新用户Token
+GET http://127.0.0.1:8080/hikiot/user/token/refresh?appAccessToken=at-8j_hNQ6mHaS4emK7N9VZfOEgI879cW4LMtcEifyF&userAccessToken=ut-896f220c-5edb-4ba7-bb31-872fb336ea0b&refreshUserToken=urt-9f509313-e46c-4e19-a564-3dc2e1b79bce
+
+### 获取非设备Token
+GET http://127.0.0.1:8080/hikiot/ops/token
+
+### 获取资源详情（指定设备序列号和通道号）
+GET http://127.0.0.1:8080/hikiot/resource?deviceSerial=GU0609982&channelNo=1
+
+### 获取设备Token（指定设备序列号和通道号）
+GET http://127.0.0.1:8080/hikiot/device/token?deviceSerial=GU0609982&channelNo=1
+
+### 获取设备能力集（指定设备序列号和通道号）
+GET http://127.0.0.1:8080/hikiot/device/capacity?deviceSerial=GU0609982&channelNo=1
+
+### 获取所有设备（默认每页50条）
+GET http://127.0.0.1:8080/hikiot/device/list
+
+### 获取设备分页（指定页码和大小）
+GET http://127.0.0.1:8080/hikiot/device/page?page=1&size=20
+
