@@ -1,134 +1,213 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>萤石设备播放调试</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 30px 20px; }
-        h1 { color: #1a1a1a; margin-bottom: 24px; font-size: 24px; }
-        .panel { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 28px; width: 100%; max-width: 800px; }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-size: 14px; color: #555; margin-bottom: 6px; font-weight: 500; }
-        input, select { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; }
-        input:focus, select:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
-        .row { display: flex; gap: 12px; }
-        .row > .form-group { flex: 1; }
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { flex: 1; padding: 10px 20px; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-        .btn-play { background: #1677ff; color: #fff; }
-        .btn-play:hover { background: #4096ff; }
-        .btn-stop { background: #ff4d4f; color: #fff; }
-        .btn-stop:hover { background: #ff7875; }
-        .btn-copy { background: #f5f5f5; color: #333; border: 1px solid #d9d9d9; }
-        .btn-copy:hover { background: #e8e8e8; }
-        .player-area { margin-top: 24px; width: 100%; max-width: 800px; }
-        .player-area iframe { width: 100%; height: 450px; border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
-        .tip { font-size: 12px; color: #999; margin-top: 4px; }
-        .url-preview { margin-top: 16px; padding: 12px; background: #fafafa; border-radius: 8px; border: 1px solid #eee; font-size: 13px; color: #666; word-break: break-all; display: none; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实时视频流播放器</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 30px 20px; }
+    h1 { color: #1a1a1a; margin-bottom: 24px; font-size: 24px; }
+    .panel { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 28px; width: 100%; max-width: 800px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 14px; color: #555; margin-bottom: 6px; font-weight: 500; }
+    input { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+    .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+    button { flex: 1; padding: 10px 20px; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-play { background: #1677ff; color: #fff; }
+    .btn-play:hover { background: #4096ff; }
+    .btn-stop { background: #ff4d4f; color: #fff; }
+    .btn-stop:hover { background: #ff7875; }
+    .btn-copy { background: #f5f5f5; color: #333; border: 1px solid #d9d9d9; }
+    .btn-copy:hover { background: #e8e8e8; }
+    .status-bar { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0; font-size: 13px; }
+    .status-item { display: flex; align-items: center; gap: 6px; }
+    .status-label { color: #999; }
+    .status-value { color: #333; font-weight: 500; }
+    .status-value.ok { color: #52c41a; }
+    .status-value.warn { color: #faad14; }
+    .status-value.error { color: #ff4d4f; }
+    .player-area { margin-top: 24px; width: 100%; max-width: 800px; }
+    .player-wrap { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    #playerContainer { width: 100%; height: 100%; }
+    .log-panel { margin-top: 24px; width: 100%; max-width: 800px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 20px 24px; }
+    .log-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .log-header h2 { font-size: 15px; color: #333; font-weight: 500; }
+    .log-btn-group { display: flex; gap: 8px; }
+    .log-btn { flex: none; padding: 5px 14px; font-size: 12px; background: #f5f5f5; color: #555; border: 1px solid #d9d9d9; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+    .log-btn:hover { background: #e8e8e8; }
+    #logBox { height: 180px; overflow-y: auto; background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 10px 12px; font-family: Consolas, "Courier New", monospace; font-size: 12px; line-height: 1.7; white-space: pre-wrap; word-break: break-all; }
+    .log-time { color: #999; }
+    .log-info { color: #1677ff; }
+    .log-success { color: #52c41a; }
+    .log-warn { color: #faad14; }
+    .log-error { color: #ff4d4f; }
+  </style>
 </head>
 <body>
-    <h1>萤石设备播放调试工具</h1>
-    <div class="panel">
-        <div class="form-group">
-            <label>AccessToken</label>
-            <input type="text" id="accessToken" placeholder="请输入萤石开放平台的 accessToken">
-        </div>
-        <div class="row">
-            <div class="form-group">
-                <label>设备序列号 (deviceSerial)</label>
-                <input type="text" id="deviceSerial" placeholder="例如: D12345678">
-            </div>
-            <div class="form-group" style="max-width: 120px;">
-                <label>通道号</label>
-                <input type="number" id="channelNo" value="1" min="1">
-            </div>
-        </div>
-        <div class="row">
-            <div class="form-group">
-                <label>播放类型</label>
-                <select id="playType">
-                    <option value="live">实时直播</option>
-                    <option value="rec">录像回放</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>清晰度</label>
-                <select id="quality">
-                    <option value="">默认</option>
-                    <option value="hd">高清</option>
-                    <option value="sd">标清</option>
-                </select>
-            </div>
-        </div>
-        <div class="btn-group">
-            <button class="btn-play" onclick="play()">播放</button>
-            <button class="btn-stop" onclick="stop()">停止</button>
-            <button class="btn-copy" onclick="copyUrl()">复制地址</button>
-        </div>
-        <div class="url-preview" id="urlPreview"></div>
+  <h1>实时视频流播放器 </h1>
+  <div class="panel">
+    <div class="form-group">
+      <label>视频流地址</label>
+      <input id="urlInput" type="text" placeholder="支持通过 http 或 websocket 获取的 flv 流，例如 ws://host:port/rtp/xxx.live.flv" value="ws://wvp.xjher.com:18067/rtp/65292525401327000003_65292525401327000003.live.flv?originTypeStr=rtp_push" />
     </div>
-    <div class="player-area" id="playerArea"></div>
+    <div class="btn-group">
+      <button id="playBtn" class="btn-play" type="button">确定播放</button>
+      <button id="stopBtn" class="btn-stop" type="button">停止</button>
+      <button id="copyUrlBtn" class="btn-copy" type="button">复制地址</button>
+    </div>
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-label">状态</span>
+        <span id="playStatus" class="status-value">未播放</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">码率</span>
+        <span id="kBpsStatus" class="status-value">-</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">流畅度</span>
+        <span id="perfStatus" class="status-value">-</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">分辨率</span>
+        <span id="videoInfoStatus" class="status-value">-</span>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        function buildEzopenUrl() {
-            const token = document.getElementById('accessToken').value.trim();
-            const serial = document.getElementById('deviceSerial').value.trim();
-            const channel = document.getElementById('channelNo').value.trim() || '1';
-            const playType = document.getElementById('playType').value;
-            const quality = document.getElementById('quality').value;
+  <div class="player-area">
+    <div class="player-wrap">
+      <div id="playerContainer"></div>
+    </div>
+  </div>
 
-            if (!token || !serial) {
-                alert('请填写 AccessToken 和 设备序列号');
-                return null;
-            }
+  <div class="log-panel">
+    <div class="log-header">
+      <h2>调试日志</h2>
+      <div class="log-btn-group">
+        <button id="copyLogBtn" class="log-btn" type="button">复制日志</button>
+        <button id="clearLogBtn" class="log-btn" type="button">清空日志</button>
+      </div>
+    </div>
+    <div id="logBox"></div>
+  </div>
 
-            let path = channel;
-            if (quality) path += '.' + quality;
-            path += '.' + playType;
+  <script src="./jessibuca/jessibuca.js"></script>
+  <script>
+    (function () {
+      var player = null;
+      var urlInput = document.getElementById('urlInput');
+      var logBox = document.getElementById('logBox');
+      var playStatus = document.getElementById('playStatus');
+      var kBpsStatus = document.getElementById('kBpsStatus');
+      var perfStatus = document.getElementById('perfStatus');
+      var videoInfoStatus = document.getElementById('videoInfoStatus');
 
-            const ezopenUrl = `ezopen://open.ys7.com/${serial}/${path}`;
-            const iframeSrc = `https://open.ys7.com/ezopen/h5/iframe?url=${encodeURIComponent(ezopenUrl)}&autoplay=1&accessToken=${token}`;
+      function now() { return new Date().toLocaleTimeString('zh-CN', { hour12: false }); }
 
-            return { ezopenUrl, iframeSrc };
-        }
+      function log(msg, type) {
+        var d = document.createElement('div');
+        d.innerHTML = '<span class="log-time">[' + now() + ']</span> <span class="log-' + (type || 'info') + '">' + msg + '</span>';
+        logBox.appendChild(d);
+        logBox.scrollTop = logBox.scrollHeight;
+      }
 
-        function play() {
-            const result = buildEzopenUrl();
-            if (!result) return;
+      function setStatus(text, cls) {
+        playStatus.textContent = text;
+        playStatus.className = 'status-value' + (cls ? ' ' + cls : '');
+      }
 
-            const preview = document.getElementById('urlPreview');
-            preview.style.display = 'block';
-            preview.innerHTML = `<strong>ezopen:</strong> ${result.ezopenUrl}<br><strong>iframe:</strong> ${result.iframeSrc}`;
+      function destroy() {
+        if (player) { try { player.destroy(); } catch (e) { log('销毁异常: ' + e.message, 'warn'); } player = null; }
+        setStatus('已停止');
+        kBpsStatus.textContent = '-';
+        perfStatus.textContent = '-';
+        videoInfoStatus.textContent = '-';
+      }
 
-            const area = document.getElementById('playerArea');
-            area.innerHTML = `<iframe src="${result.iframeSrc}" allowfullscreen allow="autoplay"></iframe>`;
-        }
+      function createPlayer() {
+        document.getElementById('playerContainer').innerHTML = '';
+        player = new window.Jessibuca({
+          container: document.getElementById('playerContainer'),
+          autoWasm: true,
+          debug: true,
+          decoder: './jessibuca/decoder.js',
+          hasAudio: true,
+          heartTimeout: 5,
+          heartTimeoutReplay: true,
+          heartTimeoutReplayTimes: 3,
+          hotKey: true,
+          isResize: true,
+          keepScreenOn: true,
+          loadingText: '请稍等, 视频加载中......',
+          loadingTimeout: 10,
+          loadingTimeoutReplay: true,
+          loadingTimeoutReplayTimes: 3,
+          operateBtns: { fullscreen: false, screenshot: false, play: false, audio: false, record: false },
+          timeout: 10,
+          useMSE: true,
+          videoBuffer: 0.1,
+          wasmDecodeErrorReplay: true
+        });
+        bindEvents(player);
+        return player;
+      }
 
-        function stop() {
-            document.getElementById('playerArea').innerHTML = '';
-            document.getElementById('urlPreview').style.display = 'none';
-        }
+      function bindEvents(p) {
+        p.on('load', function () { log('播放器加载完成', 'success'); });
+        p.on('play', function () { setStatus('播放中', 'ok'); log('开始播放', 'success'); });
+        p.on('pause', function () { setStatus('已暂停', 'warn'); });
+        p.on('kBps', function (v) { kBpsStatus.textContent = Math.round(v) + ' kb/s'; });
+        p.on('performance', function (v) {
+          perfStatus.textContent = v === 2 ? '非常流畅' : v === 1 ? '流畅' : '卡顿';
+        });
+        p.on('videoInfo', function (info) {
+          var text = (info.width || '?') + ' x ' + (info.height || '?');
+          videoInfoStatus.textContent = text;
+          log('视频信息: ' + text);
+        });
+        p.on('error', function (m) { setStatus('播放错误', 'error'); log('错误: ' + m, 'error'); });
+        p.on('timeout', function (m) { setStatus('连接超时', 'error'); log('超时: ' + m, 'error'); });
+        p.on('loadingTimeout', function () { setStatus('加载超时', 'error'); log('加载超时', 'error'); });
+      }
 
-        function copyUrl() {
-            const result = buildEzopenUrl();
-            if (!result) return;
+      function playUrl(url) {
+        if (!url) { log('请输入视频地址', 'warn'); urlInput.focus(); return; }
+        if (typeof window.Jessibuca === 'undefined') { log('Jessibuca 未加载', 'error'); return; }
+        destroy();
+        logBox.innerHTML = '';
+        log('准备播放: ' + url);
+        setStatus('连接中...', 'warn');
+        var j = createPlayer();
+        function start() { j.play(url).catch(function (e) { log('play 失败: ' + (e && e.message || e), 'error'); setStatus('播放失败', 'error'); }); }
+        j.hasLoaded() ? start() : j.on('load', start);
+      }
 
-            navigator.clipboard.writeText(result.iframeSrc).then(() => {
-                alert('地址已复制到剪贴板');
-            }).catch(() => {
-                // fallback
-                const ta = document.createElement('textarea');
-                ta.value = result.iframeSrc;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                alert('地址已复制到剪贴板');
-            });
-        }
-    </script>
+      document.getElementById('playBtn').addEventListener('click', function () { playUrl(urlInput.value.trim()); });
+      document.getElementById('stopBtn').addEventListener('click', destroy);
+      document.getElementById('copyUrlBtn').addEventListener('click', function () {
+        var url = urlInput.value.trim();
+        if (!url) { log('地址为空', 'warn'); return; }
+        navigator.clipboard.writeText(url).then(function () { log('地址已复制', 'success'); }).catch(function () {
+          var ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+          log('地址已复制', 'success');
+        });
+      });
+      urlInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') playUrl(urlInput.value.trim()); });
+      document.getElementById('clearLogBtn').addEventListener('click', function () { logBox.innerHTML = ''; });
+      document.getElementById('copyLogBtn').addEventListener('click', function () {
+        var text = logBox.innerText;
+        if (!text) { log('日志为空', 'warn'); return; }
+        navigator.clipboard.writeText(text).then(function () { log('日志已复制', 'success'); }).catch(function () {
+          var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+          log('日志已复制', 'success');
+        });
+      });
+      window.addEventListener('beforeunload', destroy);
+      log('页面就绪，输入地址后点击「确定播放」');
+    })();
+  </script>
 </body>
 </html>

@@ -9,4 +9,10 @@
 
 ## 访问地址
 
-http://localhost:8080/
+【开源】Jessibuca播放器：支持通过 HTTP 或 WebSocket 获取的 FLV 流
+
+http://localhost:8080/index.html
+
+【SDK】官方WEB页面嵌入
+
+http://localhost:8080/index_frame.html
