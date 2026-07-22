@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>萤石设备播放调试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 30px 20px; }
+        h1 { color: #1a1a1a; margin-bottom: 24px; font-size: 24px; }
+        .panel { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 28px; width: 100%; max-width: 800px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 14px; color: #555; margin-bottom: 6px; font-weight: 500; }
+        input, select { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        input:focus, select:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        .row { display: flex; gap: 12px; }
+        .row > .form-group { flex: 1; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 10px 20px; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-play { background: #1677ff; color: #fff; }
+        .btn-play:hover { background: #4096ff; }
+        .btn-stop { background: #ff4d4f; color: #fff; }
+        .btn-stop:hover { background: #ff7875; }
+        .btn-copy { background: #f5f5f5; color: #333; border: 1px solid #d9d9d9; }
+        .btn-copy:hover { background: #e8e8e8; }
+        .player-area { margin-top: 24px; width: 100%; max-width: 800px; }
+        .player-area iframe { width: 100%; height: 450px; border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .tip { font-size: 12px; color: #999; margin-top: 4px; }
+        .url-preview { margin-top: 16px; padding: 12px; background: #fafafa; border-radius: 8px; border: 1px solid #eee; font-size: 13px; color: #666; word-break: break-all; display: none; }
+    </style>
+</head>
+<body>
+    <h1>萤石设备播放调试工具</h1>
+    <div class="panel">
+        <div class="form-group">
+            <label>AccessToken</label>
+            <input type="text" id="accessToken" placeholder="请输入萤石开放平台的 accessToken">
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label>设备序列号 (deviceSerial)</label>
+                <input type="text" id="deviceSerial" placeholder="例如: D12345678">
+            </div>
+            <div class="form-group" style="max-width: 120px;">
+                <label>通道号</label>
+                <input type="number" id="channelNo" value="1" min="1">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label>播放类型</label>
+                <select id="playType">
+                    <option value="live">实时直播</option>
+                    <option value="rec">录像回放</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>清晰度</label>
+                <select id="quality">
+                    <option value="">默认</option>
+                    <option value="hd">高清</option>
+                    <option value="sd">标清</option>
+                </select>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-play" onclick="play()">播放</button>
+            <button class="btn-stop" onclick="stop()">停止</button>
+            <button class="btn-copy" onclick="copyUrl()">复制地址</button>
+        </div>
+        <div class="url-preview" id="urlPreview"></div>
+    </div>
+    <div class="player-area" id="playerArea"></div>
+
+    <script>
+        function buildEzopenUrl() {
+            const token = document.getElementById('accessToken').value.trim();
+            const serial = document.getElementById('deviceSerial').value.trim();
+            const channel = document.getElementById('channelNo').value.trim() || '1';
+            const playType = document.getElementById('playType').value;
+            const quality = document.getElementById('quality').value;
+
+            if (!token || !serial) {
+                alert('请填写 AccessToken 和 设备序列号');
+                return null;
+            }
+
+            let path = channel;
+            if (quality) path += '.' + quality;
+            path += '.' + playType;
+
+            const ezopenUrl = `ezopen://open.ys7.com/${serial}/${path}`;
+            const iframeSrc = `https://open.ys7.com/ezopen/h5/iframe?url=${encodeURIComponent(ezopenUrl)}&autoplay=1&accessToken=${token}`;
+
+            return { ezopenUrl, iframeSrc };
+        }
+
+        function play() {
+            const result = buildEzopenUrl();
+            if (!result) return;
+
+            const preview = document.getElementById('urlPreview');
+            preview.style.display = 'block';
+            preview.innerHTML = `<strong>ezopen:</strong> ${result.ezopenUrl}<br><strong>iframe:</strong> ${result.iframeSrc}`;
+
+            const area = document.getElementById('playerArea');
+            area.innerHTML = `<iframe src="${result.iframeSrc}" allowfullscreen allow="autoplay"></iframe>`;
+        }
+
+        function stop() {
+            document.getElementById('playerArea').innerHTML = '';
+            document.getElementById('urlPreview').style.display = 'none';
+        }
+
+        function copyUrl() {
+            const result = buildEzopenUrl();
+            if (!result) return;
+
+            navigator.clipboard.writeText(result.iframeSrc).then(() => {
+                alert('地址已复制到剪贴板');
+            }).catch(() => {
+                // fallback
+                const ta = document.createElement('textarea');
+                ta.value = result.iframeSrc;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert('地址已复制到剪贴板');
+            });
+        }
+    </script>
+</body>
+</html>
