@@ -169,7 +169,7 @@ public class Ys7Service {
 		logger.info("开始查询所有设备");
 
 		int pageStart = 0;
-		int pageSize = 10;
+		int pageSize = 50;
 		List<DeviceResponse.Device> allDevices = new ArrayList<>();
 
 		while (true) {
