@@ -104,7 +104,7 @@ public class HikiotController {
 	}
 
 	/**
-	 * 操作Ezviz数据
+	 * 操作Ezviz数据（注意：如果code返回0，表示是需要向sdk透传完整结果集）
 	 * 
 	 * @return
 	 */
@@ -113,7 +113,7 @@ public class HikiotController {
 		Map<String, Object> result = new HashMap<>();
 		try {
 			Map<String, Object> data = hikiotService.getEzvizData();
-			result.put("code", 200);
+			result.put("code", 0);
 			result.put("msg", "操作成功");
 			result.put("data", data);
 		} catch (Exception e) {
@@ -125,7 +125,7 @@ public class HikiotController {
 	}
 
 	/**
-	 * 操作设备资源数据
+	 * 操作设备资源数据（注意：如果code返回0，表示是需要向sdk透传完整结果集）
 	 * 
 	 * @param deviceSerial
 	 * @param channelNo
@@ -137,7 +137,7 @@ public class HikiotController {
 		Map<String, Object> result = new HashMap<>();
 		try {
 			Map<String, Object> data = hikiotService.getResourcesData(deviceSerial, channelNo);
-			result.put("code", 200);
+			result.put("code", 0);
 			result.put("msg", "操作成功");
 			result.put("data", data);
 		} catch (Exception e) {
@@ -149,7 +149,7 @@ public class HikiotController {
 	}
 
 	/**
-	 * 操作设备token
+	 * 操作设备token（注意：如果code返回0，表示是需要向sdk透传完整结果集）
 	 * 
 	 * @param deviceSerial
 	 * @param channelNo
@@ -161,9 +161,9 @@ public class HikiotController {
 		Map<String, Object> result = new HashMap<>();
 		try {
 			Map<String, Object> data = hikiotService.getTokensData(deviceSerial, channelNo);
-			result.put("code", 200);
+			result.put("code", 0);
 			result.put("msg", "操作成功");
-			result.put("data", data);
+			result.put("data", data.get("data"));
 		} catch (Exception e) {
 			result.put("code", 500);
 			result.put("msg", e.getMessage());
@@ -173,7 +173,7 @@ public class HikiotController {
 	}
 
 	/**
-	 * 操作设备能力数据
+	 * 操作设备能力数据（注意：如果code返回0，表示是需要向sdk透传完整结果集）
 	 * 
 	 * @param deviceSerial
 	 * @param channelNo
@@ -185,7 +185,7 @@ public class HikiotController {
 		Map<String, Object> result = new HashMap<>();
 		try {
 			Map<String, Object> data = hikiotService.getCapacitysData(deviceSerial, channelNo);
-			result.put("code", 200);
+			result.put("code", 0);
 			result.put("msg", "操作成功");
 			result.put("data", data);
 		} catch (Exception e) {
