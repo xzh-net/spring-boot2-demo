@@ -123,7 +123,7 @@ public class Ys7Service {
 	}
 
 	public DeviceResponse getDeviceList(Integer pageStart, Integer pageSize) {
-		logger.info("开始查询设备列表");
+		logger.info("开始查询设备列表，page={}, size={}", pageStart, pageSize);
 
 		String accessToken = getAppAccessToken();
 
