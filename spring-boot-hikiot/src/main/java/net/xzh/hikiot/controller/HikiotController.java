@@ -247,7 +247,7 @@ public class HikiotController {
 	 * 
 	 * @return
 	 */
-	@GetMapping("/clean")
+	@GetMapping("/token/clean")
 	public Map<String, Object> cleanToken() {
 		Map<String, Object> result = new HashMap<>();
 		try {
