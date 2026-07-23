@@ -382,25 +382,35 @@ public class HikiotService {
 		String appToken = getAppAccessToken();
 		String userToken = getUserAccessToken();
 
-		return getDevicePageInternal(appToken, userToken, page, size);
+
+		Map<String, Object> params = new HashMap<>();
+		if (page != null) {
+			params.put("page", page);
+		}
+		if (size != null) {
+			params.put("size", size);
+		}
+
+		Map<String, Object> data = getHikvisionDataByGet(API_DEVICE_LIST_URL, appToken, userToken, params, true);
+
+		logger.info("结束获取设备分页查询");
+		
+		return data;
 	}
 
 	public Map<String, Object> getAllDevices() {
 		logger.info("开始查询所有设备");
-
-		String appToken = getAppAccessToken();
-		String userToken = getUserAccessToken();
 
 		int page = 1;
 		int size = 50;
 		List<Map<String, Object>> allDeviceList = new java.util.ArrayList<>();
 
 		while (true) {
-			Map<String, Object> data = getDevicePageInternal(appToken, userToken, page, size);
+			Map<String, Object> data = getDevicePage(page, size);
 
 			if (data != null && data.containsKey("data")) {
 				List<Map<String, Object>> deviceList = (List<Map<String, Object>>) data.get("data");
-				logger.info("第{}页获取到{}条设备数据", page, deviceList.size());
+				logger.info("第 {} 页，共 {} 条记录", page, deviceList.size());
 
 				if (deviceList.isEmpty()) {
 					break;
@@ -429,25 +439,8 @@ public class HikiotService {
 		result.put("data", allDeviceList);
 		result.put("total", allDeviceList.size());
 
-		logger.info("查询所有设备完成，共获取到{}条设备数据", allDeviceList.size());
+		logger.info("查询所有设备完成，共获取到 {} 条设备数据", allDeviceList.size());
 		return result;
-	}
-
-	private Map<String, Object> getDevicePageInternal(String appToken, String userToken, Integer page, Integer size) {
-		logger.info("开始获取设备分页查询，page={}, size={}", page, size);
-
-		Map<String, Object> params = new HashMap<>();
-		if (page != null) {
-			params.put("page", page);
-		}
-		if (size != null) {
-			params.put("size", size);
-		}
-
-		Map<String, Object> data = getHikvisionDataByGet(API_DEVICE_LIST_URL, appToken, userToken, params, true);
-
-		logger.info("结束获取设备分页查询");
-		return data;
 	}
 
 	private Map<String, Object> getHikvisionDataPost(String API_URL, String appAccessToken, String userAccessToken,
