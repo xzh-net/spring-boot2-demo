@@ -13,7 +13,7 @@ GET http://127.0.0.1:8080/hikiot/user/token
 POST http://127.0.0.1:8080/hikiot/user/token/refresh
 
 ### 清空所有token
-GET http://127.0.0.1:8080/hikiot/clean
+GET http://127.0.0.1:8080/hikiot/token/clean
 
 ### 获取非设备Token
 GET http://127.0.0.1:8080/hikiot/ops/token
