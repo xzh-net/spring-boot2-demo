@@ -3,14 +3,17 @@
 ### 获取应用Token
 GET http://127.0.0.1:8080/hikiot/token
 
-### 刷新应用Token
-GET http://127.0.0.1:8080/hikiot/token/refresh?appAccessToken=at-y0DshS6BWcX7qPBHVAReC8SWXtLYLDF36SyTKFSK&refreshAppToken=art-l9RBrXfpOsvt4b0UoijV3xwkJwp4Bgi0ksZFKgtV
+### 刷新应用Token（需先获取应用token）
+POST http://127.0.0.1:8080/hikiot/token/refresh
 
 ### 获取用户Token
 GET http://127.0.0.1:8080/hikiot/user/token
 
-### 刷新用户Token
-GET http://127.0.0.1:8080/hikiot/user/token/refresh?appAccessToken=at-8j_hNQ6mHaS4emK7N9VZfOEgI879cW4LMtcEifyF&userAccessToken=ut-896f220c-5edb-4ba7-bb31-872fb336ea0b&refreshUserToken=urt-9f509313-e46c-4e19-a564-3dc2e1b79bce
+### 刷新用户Token（需先获取用户token）
+POST http://127.0.0.1:8080/hikiot/user/token/refresh
+
+### 清空所有token
+GET http://127.0.0.1:8080/hikiot/clean
 
 ### 获取非设备Token
 GET http://127.0.0.1:8080/hikiot/ops/token
