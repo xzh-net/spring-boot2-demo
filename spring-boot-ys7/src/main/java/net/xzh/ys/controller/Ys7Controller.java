@@ -28,10 +28,10 @@ public class Ys7Controller {
     public Map<String, Object> getAccessToken() {
         Map<String, Object> result = new HashMap<>();
         try {
-            String accessToken = ys7Service.getAccessToken();
+            Map<String, Object> tokenResult = ys7Service.getAppToken();
             result.put("code", 200);
             result.put("msg", "操作成功");
-            result.put("data", accessToken);
+            result.put("data", tokenResult);
         } catch (Exception e) {
             result.put("code", 500);
             result.put("msg", e.getMessage());
@@ -81,6 +81,22 @@ public class Ys7Controller {
             result.put("code", 200);
             result.put("msg", "操作成功");
             result.put("data", response.getData());
+        } catch (Exception e) {
+            result.put("code", 500);
+            result.put("msg", e.getMessage());
+            result.put("data", null);
+        }
+        return result;
+    }
+
+    @GetMapping("/token/clean")
+    public Map<String, Object> cleanToken() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            ys7Service.cleanToken();
+            result.put("code", 200);
+            result.put("msg", "操作成功");
+            result.put("data", null);
         } catch (Exception e) {
             result.put("code", 500);
             result.put("msg", e.getMessage());

@@ -18,233 +18,252 @@ import net.xzh.ys.model.LiveAddressResponse;
 import net.xzh.ys.model.TokenResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class Ys7Service {
-    private static final Logger logger = LoggerFactory.getLogger(Ys7Service.class);
-    private static final String TOKEN_URL = "https://open.ys7.com/api/lapp/token/get";
-    private static final String DEVICE_LIST_URL = "https://open.ys7.com/api/lapp/device/list";
-    private static final String LIVE_ADDRESS_URL = "https://open.ys7.com/api/lapp/v2/live/address/get";
+	private static final Logger logger = LoggerFactory.getLogger(Ys7Service.class);
+	private static final String API_TOKEN_URL = "https://open.ys7.com/api/lapp/token/get";
+	private static final String API_DEVICE_LIST_URL = "https://open.ys7.com/api/lapp/device/list";
+	private static final String API_LIVE_ADDRESS_URL = "https://open.ys7.com/api/lapp/v2/live/address/get";
 
-    @Autowired
-    private Ys7Properties ys7Properties;
+	private static final long TOKEN_EXPIRE_BUFFER_MS = 1 * 3600 * 1000L;
 
-    @Autowired
-    private RestTemplate restTemplate;
+	@Autowired
+	private Ys7Properties ys7Properties;
 
-    public String getAccessToken() {
-        logger.info("开始获取 AccessToken");
+	@Autowired
+	private RestTemplate restTemplate;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+	private volatile TokenHolder tokenHolder;
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("appKey", ys7Properties.getAppKey());
-        body.add("appSecret", ys7Properties.getAppSecret());
+	private static class TokenHolder {
+		String accessToken;
+		long expireTime;
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+		TokenHolder(String accessToken, long expireTime) {
+			this.accessToken = accessToken;
+			this.expireTime = expireTime;
+		}
 
-        try {
-            ResponseEntity<TokenResponse> responseEntity = restTemplate.postForEntity(
-                    TOKEN_URL,
-                    requestEntity,
-                    TokenResponse.class
-            );
+		boolean isValid() {
+			return accessToken != null && !accessToken.isEmpty()
+					&& System.currentTimeMillis() < expireTime - TOKEN_EXPIRE_BUFFER_MS;
+		}
+	}
 
-            TokenResponse response = responseEntity.getBody();
-            if (response != null && "200".equals(response.getCode())) {
-                String accessToken = response.getData().getAccessToken();
-                logger.info("获取 AccessToken 成功");
-                return accessToken;
-            } else {
-                String errMsg = response != null ? response.getMsg() : "接口返回空";
-                logger.error("获取 AccessToken 失败: {}", errMsg);
-                throw new RuntimeException("获取 AccessToken 失败: " + errMsg);
-            }
-        } catch (Exception e) {
-            logger.error("调用 Token 接口异常", e);
-            throw new RuntimeException("调用 Token 接口异常", e);
-        }
-    }
+	private String getAppAccessToken() {
+		getAppToken();
+		return tokenHolder != null ? tokenHolder.accessToken : null;
+	}
 
-    public DeviceResponse getDeviceList(Integer pageStart, Integer pageSize) {
-        logger.info("开始查询设备列表，pageStart={}, pageSize={}", pageStart, pageSize);
+	public Map<String, Object> getAppToken() {
+		if (tokenHolder != null && tokenHolder.isValid()) {
+			logger.info("使用缓存的应用Token");
+			Map<String, Object> result = new HashMap<>();
+			result.put("accessToken", tokenHolder.accessToken);
+			result.put("expireAt", tokenHolder.expireTime);
+			return result;
+		}
 
-        String accessToken = getAccessToken();
+		synchronized (this) {
+			if (tokenHolder != null && tokenHolder.isValid()) {
+				logger.info("使用缓存的应用Toke（二次检查）");
+				Map<String, Object> result = new HashMap<>();
+				result.put("accessToken", tokenHolder.accessToken);
+				result.put("expireAt", tokenHolder.expireTime);
+				return result;
+			}
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			logger.info("开始获取应用token");
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("accessToken", accessToken);
-        if (pageStart != null) {
-            body.add("pageStart", pageStart.toString());
-        }
-        if (pageSize != null) {
-            body.add("pageSize", pageSize.toString());
-        }
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+			MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+			body.add("appKey", ys7Properties.getAppKey());
+			body.add("appSecret", ys7Properties.getAppSecret());
 
-        try {
-            ResponseEntity<DeviceResponse> responseEntity = restTemplate.postForEntity(
-                    DEVICE_LIST_URL,
-                    requestEntity,
-                    DeviceResponse.class
-            );
+			HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
 
-            DeviceResponse response = responseEntity.getBody();
-            if (response != null && "200".equals(response.getCode())) {
-                logger.info("查询设备列表成功，共 {} 条记录",
-                        response.getPage() != null ? response.getPage().getTotal() : 0);
-                return response;
-            } else {
-                String errMsg = response != null ? response.getMsg() : "接口返回空";
-                logger.error("查询设备列表失败: {}", errMsg);
-                throw new RuntimeException("查询设备列表失败: " + errMsg);
-            }
-        } catch (Exception e) {
-            logger.error("调用设备列表接口异常", e);
-            throw new RuntimeException("调用设备列表接口异常", e);
-        }
-    }
+			logger.info("POST请求 - URL: {}, params: {}", API_TOKEN_URL, requestEntity);
+			try {
+				ResponseEntity<TokenResponse> responseEntity = restTemplate.postForEntity(API_TOKEN_URL, requestEntity,
+						TokenResponse.class);
 
-    public DeviceResponse getAllDevices() {
-        logger.info("开始查询所有设备");
+				TokenResponse response = responseEntity.getBody();
+				logger.info("获取萤石数据成功,{}", response);
 
-        String accessToken = getAccessToken();
-        int pageStart = 0;
-        int pageSize = 50;
-        List<DeviceResponse.Device> allDevices = new ArrayList<>();
+				if (response != null && "200".equals(response.getCode())) {
+					String accessToken = response.getData().getAccessToken();
+					Long expireTime = response.getData().getExpireTime();
+					tokenHolder = new TokenHolder(accessToken, expireTime);
 
-        while (true) {
-            DeviceResponse response = getDeviceList(accessToken, pageStart, pageSize);
-            List<DeviceResponse.Device> devices = response.getData();
+					Map<String, Object> result = new HashMap<>();
+					result.put("accessToken", accessToken);
+					result.put("expireAt", expireTime);
 
-            if (devices == null || devices.isEmpty()) {
-                break;
-            }
+					logger.info("accessToken: {} ", accessToken);
+					logger.info("expireTime: {} ", expireTime);
 
-            allDevices.addAll(devices);
-            logger.info("第 {} 页获取到 {} 条设备数据", pageStart, devices.size());
+					logger.info("结束获取应用token");
+					return result;
+				} else {
+					String errMsg = response != null ? response.getMsg() : "接口返回空";
+					logger.error("获取accessToken失败: {}", errMsg);
+					throw new RuntimeException("获取accessToken失败: " + errMsg);
+				}
+			} catch (Exception e) {
+				logger.error("调用Token接口异常", e);
+				throw new RuntimeException("调用Token接口异常", e);
+			}
+		}
+	}
 
-            if (devices.size() < pageSize) {
-                break;
-            }
+	public DeviceResponse getDeviceList(Integer pageStart, Integer pageSize) {
+		logger.info("开始查询设备列表");
 
-            pageStart++;
-        }
+		String accessToken = getAppAccessToken();
 
-        DeviceResponse result = new DeviceResponse();
-        result.setCode("200");
-        result.setMsg("操作成功");
-        result.setData(allDevices);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        DeviceResponse.PageInfo pageInfo = new DeviceResponse.PageInfo();
-        pageInfo.setTotal(allDevices.size());
-        pageInfo.setSize(allDevices.size());
-        pageInfo.setPage(0);
-        result.setPage(pageInfo);
+		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+		body.add("accessToken", accessToken);
+		if (pageStart != null) {
+			body.add("pageStart", pageStart.toString());
+		}
+		if (pageSize != null) {
+			body.add("pageSize", pageSize.toString());
+		}
 
-        logger.info("查询所有设备完成，共获取到 {} 条设备数据", allDevices.size());
-        return result;
-    }
+		HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
 
-    private DeviceResponse getDeviceList(String accessToken, Integer pageStart, Integer pageSize) {
-        logger.info("开始查询设备列表，accessToken={}, pageStart={}, pageSize={}", accessToken != null ? "***" : null, pageStart, pageSize);
+		logger.info("POST请求 - URL: {}, params: {}", API_DEVICE_LIST_URL, requestEntity);
+		try {
+			ResponseEntity<DeviceResponse> responseEntity = restTemplate.postForEntity(API_DEVICE_LIST_URL,
+					requestEntity, DeviceResponse.class);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			DeviceResponse response = responseEntity.getBody();
+			logger.info("获取萤石数据成功,{}", response);
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("accessToken", accessToken);
-        if (pageStart != null) {
-            body.add("pageStart", pageStart.toString());
-        }
-        if (pageSize != null) {
-            body.add("pageSize", pageSize.toString());
-        }
+			if (response != null && "200".equals(response.getCode())) {
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+				logger.info("查询设备列表成功，第 {} 页，共 {} 条记录", pageStart,
+						response.getData() != null ? response.getData().size(): 0);
+				return response;
+			} else {
+				String errMsg = response != null ? response.getMsg() : "接口返回空";
+				logger.error("查询设备列表失败: {}", errMsg);
+				throw new RuntimeException("查询设备列表失败: " + errMsg);
+			}
+		} catch (Exception e) {
+			logger.error("调用设备列表接口异常", e);
+			throw new RuntimeException("调用设备列表接口异常", e);
+		}
+	}
 
-        try {
-            ResponseEntity<DeviceResponse> responseEntity = restTemplate.postForEntity(
-                    DEVICE_LIST_URL,
-                    requestEntity,
-                    DeviceResponse.class
-            );
+	public DeviceResponse getAllDevices() {
+		logger.info("开始查询所有设备");
 
-            DeviceResponse response = responseEntity.getBody();
-            if (response != null && "200".equals(response.getCode())) {
-                logger.info("查询设备列表成功，共 {} 条记录",
-                        response.getPage() != null ? response.getPage().getTotal() : 0);
-                return response;
-            } else {
-                String errMsg = response != null ? response.getMsg() : "接口返回空";
-                logger.error("查询设备列表失败: {}", errMsg);
-                throw new RuntimeException("查询设备列表失败: " + errMsg);
-            }
-        } catch (Exception e) {
-            logger.error("调用设备列表接口异常", e);
-            throw new RuntimeException("调用设备列表接口异常", e);
-        }
-    }
+		int pageStart = 0;
+		int pageSize = 10;
+		List<DeviceResponse.Device> allDevices = new ArrayList<>();
 
-    public LiveAddressResponse getLiveAddress(String deviceSerial, Integer channelNo, Integer protocol, Integer expireTime, Integer quality, Integer type, String startTime, String stopTime) {
-        logger.info("开始获取设备播放地址，deviceSerial={}, channelNo={}, protocol={}", deviceSerial, channelNo, protocol);
+		while (true) {
+			DeviceResponse response = getDeviceList(pageStart, pageSize);
+			List<DeviceResponse.Device> devices = response.getData();
 
-        String accessToken = getAccessToken();
+			if (devices == null || devices.isEmpty()) {
+				break;
+			}
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			allDevices.addAll(devices);
+			if (devices.size() < pageSize) {
+				break;
+			}
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("accessToken", accessToken);
-        body.add("deviceSerial", deviceSerial);
-        if (channelNo != null) {
-            body.add("channelNo", channelNo.toString());
-        }
-        if (protocol != null) {
-            body.add("protocol", protocol.toString());
-        }
-        if (expireTime != null) {
-            body.add("expireTime", expireTime.toString());
-        }
-        if (quality != null) {
-            body.add("quality", quality.toString());
-        }
-        if (type != null) {
-            body.add("type", type.toString());
-        }
-        if (startTime != null) {
-            body.add("startTime", startTime);
-        }
-        if (stopTime != null) {
-            body.add("stopTime", stopTime);
-        }
+			pageStart++;
+		}
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+		DeviceResponse result = new DeviceResponse();
+		result.setCode("200");
+		result.setMsg("操作成功");
+		result.setData(allDevices);
 
-        try {
-            ResponseEntity<LiveAddressResponse> responseEntity = restTemplate.postForEntity(
-                    LIVE_ADDRESS_URL,
-                    requestEntity,
-                    LiveAddressResponse.class
-            );
+		DeviceResponse.PageInfo pageInfo = new DeviceResponse.PageInfo();
+		pageInfo.setTotal(allDevices.size());
+		pageInfo.setSize(allDevices.size());
+		pageInfo.setPage(0);
+		result.setPage(pageInfo);
 
-            LiveAddressResponse response = responseEntity.getBody();
-            if (response != null && "200".equals(response.getCode())) {
-                logger.info("获取设备播放地址成功，url={}", response.getData() != null ? response.getData().getUrl() : null);
-                return response;
-            } else {
-                String errMsg = response != null ? response.getMsg() : "接口返回空";
-                logger.error("获取设备播放地址失败: {}", errMsg);
-                throw new RuntimeException("获取设备播放地址失败: " + errMsg);
-            }
-        } catch (Exception e) {
-            logger.error("调用播放地址接口异常", e);
-            throw new RuntimeException("调用播放地址接口异常", e);
-        }
-    }
+		logger.info("查询所有设备完成，共获取到 {} 条设备数据", allDevices.size());
+		return result;
+	}
+
+	public LiveAddressResponse getLiveAddress(String deviceSerial, Integer channelNo, Integer protocol,
+			Integer expireTime, Integer quality, Integer type, String startTime, String stopTime) {
+		logger.info("开始获取设备播放地址，deviceSerial={}, channelNo={}, protocol={}", deviceSerial, channelNo, protocol);
+
+		String accessToken = getAppAccessToken();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+		body.add("accessToken", accessToken);
+		body.add("deviceSerial", deviceSerial);
+		if (channelNo != null) {
+			body.add("channelNo", channelNo.toString());
+		}
+		if (protocol != null) {
+			body.add("protocol", protocol.toString());
+		}
+		if (expireTime != null) {
+			body.add("expireTime", expireTime.toString());
+		}
+		if (quality != null) {
+			body.add("quality", quality.toString());
+		}
+		if (type != null) {
+			body.add("type", type.toString());
+		}
+		if (startTime != null) {
+			body.add("startTime", startTime);
+		}
+		if (stopTime != null) {
+			body.add("stopTime", stopTime);
+		}
+
+		HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+
+		logger.info("POST请求 - URL: {}, params: {}", API_LIVE_ADDRESS_URL, requestEntity);
+		try {
+			ResponseEntity<LiveAddressResponse> responseEntity = restTemplate.postForEntity(API_LIVE_ADDRESS_URL,
+					requestEntity, LiveAddressResponse.class);
+
+			LiveAddressResponse response = responseEntity.getBody();
+			logger.info("获取萤石数据成功,{}", response);
+
+			if (response != null && "200".equals(response.getCode())) {
+				logger.info("获取设备播放地址成功，url={}", response.getData() != null ? response.getData().getUrl() : null);
+				return response;
+			} else {
+				String errMsg = response != null ? response.getMsg() : "接口返回空";
+				logger.error("获取设备播放地址失败: {}", errMsg);
+				throw new RuntimeException("获取设备播放地址失败: " + errMsg);
+			}
+		} catch (Exception e) {
+			logger.error("调用播放地址接口异常", e);
+			throw new RuntimeException("调用播放地址接口异常", e);
+		}
+	}
+
+	public void cleanToken() {
+		logger.info("开始重置所有token");
+		tokenHolder = null;
+		logger.info("结束重置所有token");
+	}
 }
