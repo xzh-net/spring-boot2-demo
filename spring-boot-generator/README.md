@@ -1,6 +1,8 @@
-# 代码生成【无认证】
+# MyBatis-Plus 代码生成【无认证】
 
-1. Velocity模板引擎
+该项目同其它开发脚手架的主要封装区别：增加了`SuperMapper`和`SuperServiceImpl`的扩展。分别可以扩展逻辑恢复、物理删除，以及幂等+分布式锁的处理
+
+1. 使用Velocity模板生成代码
 
 2. SpringDoc整合
 
