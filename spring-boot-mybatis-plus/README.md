@@ -1,4 +1,4 @@
-# 基于spring-boot-mybatis-plus的快速开发脚手架【有认证】
+# MyBatis-Plus 快速开发脚手架【有认证】
 
 ## 项目演示
 
