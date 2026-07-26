@@ -1,7 +1,42 @@
-server:
-   port: 8080
-   servlet:
-      context-path: /
 spring:
-   profiles:
-      active: dev
+  datasource:
+    url: jdbc:mysql://192.168.1.161:3306/mp?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: net.xzh.generator.model
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+
+# 安全路径白名单
+secure:
+  ignored:
+    urls:
+      - /generator/**
+      - /sysuser/**
+      - /swagger-ui/**
+      - /api-docs/**
+
+## SpringDoc 配置
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    # 标签排序方式
+    tags-sorter: alpha
+    # 操作排序方式
+    operations-sorter: alpha
+    # 保持认证状态
+    persistAuthorization: true
+    # 隐藏models
+    default-models-expand-depth: -1
+  packages-to-scan: net.xzh
+  paths-to-match: /**

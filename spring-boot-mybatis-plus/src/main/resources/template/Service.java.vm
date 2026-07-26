@@ -1,0 +1,31 @@
+package ${package}.${moduleName}.service;
+
+import ${package}.${moduleName}.model.entity.${className}DO;
+import ${package}.${moduleName}.model.response.${className}DetailResp;
+import ${package}.${moduleName}.model.request.${className}PageQuery;
+import ${package}.${moduleName}.model.request.${className}SaveReq;
+import ${package}.${moduleName}.model.response.${className}ListResp;
+import ${package}.${moduleName}.common.model.PageResult;
+import ${package}.${moduleName}.framework.service.SuperService;
+
+import java.util.List;
+
+/**
+ * ${comments}服务接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${className}Service extends SuperService<${className}DO> {
+
+    void save(${className}SaveReq form);
+
+    void edit(Long id, ${className}SaveReq form);
+
+    ${className}DetailResp get(Long id);
+
+    PageResult<${className}ListResp> page(${className}PageQuery query);
+
+    List<${className}ListResp> listAll(${className}PageQuery query);
+
+}

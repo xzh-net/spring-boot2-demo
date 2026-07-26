@@ -1,0 +1,22 @@
+CREATE TABLE `sys_user` ( 
+   `id` bigint NOT NULL COMMENT '主键', 
+   `username` varchar(50) NOT NULL COMMENT '账号', 
+   `password` varchar(255) NOT NULL COMMENT '密码', 
+   `nickname` varchar(100) NOT NULL COMMENT '昵称', 
+   `head_img_url` varchar(1024) DEFAULT NULL COMMENT '头像', 
+   `mobile` varchar(20) DEFAULT NULL COMMENT '电话', 
+   `email` varchar(100) DEFAULT NULL COMMENT '邮箱', 
+   `account_balance` decimal(10,2) DEFAULT '0.00' COMMENT '余额', 
+   `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态（0正常 1禁用）', 
+   `del_flag` tinyint NOT NULL DEFAULT '0' COMMENT '删除标志（0正常 1删除）', 
+   `regist_time` datetime DEFAULT NULL COMMENT '注册时间', 
+   `create_user_id` bigint DEFAULT NULL COMMENT '创建人ID', 
+   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间', 
+   `update_user_id` bigint DEFAULT NULL COMMENT '修改人ID', 
+   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间', 
+   `sort_by` int DEFAULT '0' COMMENT '排序', 
+   PRIMARY KEY (`id`), 
+   UNIQUE KEY `uk_username` (`username`), 
+   KEY `idx_mobile` (`mobile`), 
+   KEY `idx_create_time` (`create_time`) 
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户管理';

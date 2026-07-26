@@ -1,0 +1,84 @@
+package ${package}.${moduleName}.service.impl;
+
+import org.springframework.stereotype.Service;
+import ${package}.${moduleName}.common.model.PageResult;
+import ${package}.${moduleName}.common.utils.StringUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import ${package}.${moduleName}.framework.service.impl.SuperServiceImpl;
+import ${package}.${moduleName}.mapper.${className}Mapper;
+import ${package}.${moduleName}.service.${className}Service;
+import ${package}.${moduleName}.model.entity.${className}DO;
+import ${package}.${moduleName}.model.response.${className}DetailResp;
+import ${package}.${moduleName}.model.request.${className}PageQuery;
+import ${package}.${moduleName}.model.response.${className}ListResp;
+import ${package}.${moduleName}.model.request.${className}SaveReq;
+import ${package}.${moduleName}.model.convert.${className}Convert;
+
+import java.util.List;
+
+/**
+ * ${comments}服务接口实现
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Service
+public class ${className}ServiceImpl extends SuperServiceImpl<${className}Mapper, ${className}DO> implements ${className}Service {
+
+    @Override
+    public void save(${className}SaveReq form) {
+        save(${className}Convert.INSTANCE.convert(form));
+    }
+
+    @Override
+    public void edit(Long id, ${className}SaveReq form) {
+        ${className}DO ${classname}Do = ${className}Convert.INSTANCE.convert(form);
+        ${classname}Do.setId(id);
+        updateById(${classname}Do);
+    }
+
+    @Override
+    public ${className}DetailResp get(Long id) {
+        return ${className}Convert.INSTANCE.convert(getById(id));
+    }
+
+    @Override
+    public PageResult<${className}ListResp> page(${className}PageQuery query) {
+        LambdaQueryWrapper<${className}DO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper#foreach ($column in $columns)
+#if($column.columnName != $pk.columnName && 
+    $column.columnName.toLowerCase() != "create_user_id" && 
+    $column.columnName.toLowerCase() != "create_time" && 
+    $column.columnName.toLowerCase() != "update_user_id" && 
+    $column.columnName.toLowerCase() != "update_time" && 
+    $column.columnName.toLowerCase() != "del_flag")
+#if($column.attrType == "String")
+                .like(StringUtils.isNotEmpty(query.get${column.attrName}()), ${className}DO::get${column.attrName}, query.get${column.attrName}())#else
+                .eq(query.get${column.attrName}() != null, ${className}DO::get${column.attrName}, query.get${column.attrName}())#end#end#end
+        ;
+        Page<${className}DO> page = new Page<>(query.getPageNum(), query.getPageSize());
+        IPage<${className}DO> iPage = page(page, queryWrapper);
+        return PageResult.restPage(iPage, ${className}Convert.INSTANCE.convertList(iPage.getRecords()));
+    }
+
+    @Override
+    public List<${className}ListResp> listAll(${className}PageQuery query) {
+        LambdaQueryWrapper<${className}DO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper#foreach ($column in $columns)
+#if($column.columnName != $pk.columnName && 
+    $column.columnName.toLowerCase() != "create_user_id" && 
+    $column.columnName.toLowerCase() != "create_time" && 
+    $column.columnName.toLowerCase() != "update_user_id" && 
+    $column.columnName.toLowerCase() != "update_time" && 
+    $column.columnName.toLowerCase() != "del_flag")
+#if($column.attrType == "String")
+                .like(StringUtils.isNotEmpty(query.get${column.attrName}()), ${className}DO::get${column.attrName}, query.get${column.attrName}())#else
+                .eq(query.get${column.attrName}() != null, ${className}DO::get${column.attrName}, query.get${column.attrName}())#end#end#end
+        ;
+        List<${className}DO> list = list(queryWrapper);
+        return ${className}Convert.INSTANCE.convertList(list);
+    }
+    
+}

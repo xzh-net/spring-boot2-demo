@@ -1,0 +1,31 @@
+package ${package}.${moduleName}.model.convert;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
+
+import ${package}.${moduleName}.model.request.${className}SaveReq;
+import ${package}.${moduleName}.model.response.${className}DetailResp;
+import ${package}.${moduleName}.model.response.${className}ListResp;
+import ${package}.${moduleName}.model.entity.${className}DO;
+
+import java.util.List;
+
+/**
+ * ${comments}数据转换对象
+ * 使用MapStruct实现对象之间的自动映射
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface ${className}Convert {
+
+    ${className}Convert INSTANCE = Mappers.getMapper(${className}Convert.class);
+    
+    ${className}DO convert(${className}SaveReq from);
+    
+    ${className}DetailResp convert(${className}DO ${classname});
+    
+    List<${className}ListResp> convertList(List<${className}DO> list);
+}

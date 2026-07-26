@@ -1,324 +1,79 @@
-# MyBatis-Plus 快速开发脚手架【有认证】
+# MyBatis-Plus 代码生成【无认证】
 
-## 项目演示
+该项目同其它开发脚手架的主要封装区别：增加了`SuperMapper`和`SuperServiceImpl`的扩展。分别可以扩展逻辑恢复、物理删除，以及幂等+分布式锁的处理
 
-![](doc/assets/mall_tiny_start_09.png)
+1. 使用Velocity模板生成代码
 
-## 技术选型
+2. SpringDoc整合
 
-| 技术                   | 版本    | 说明             |
-| ---------------------- | ------- | ---------------- |
-| SpringBoot             | 2.7.0   | 容器+MVC框架     |
-| SpringSecurity         | 5.3.2   | 认证和授权框架   |
-| MyBatis                | 3.5.4   | ORM框架          |
-| MyBatis-Plus           | 3.3.2   | MyBatis增强工具  |
-| MyBatis-Plus Generator | 3.3.2   | 数据层代码生成器 |
-| SpringDoc              | 1.7.0   | 文档生产工具     |
-| Redis                  | 5.0     | 分布式缓存       |
-| Docker                 | 18.09.0 | 应用容器引擎     |
-| Druid                  | 1.1.10  | 数据库连接池     |
-| JWT                    | 0.9.0   | JWT登录支持      |
-| Lombok                 | 1.18.12 | 简化对象封装工具 |
+3. MyBatis-Plus增删改使用IService实现
 
-## 数据库表结构
+4. 雪花ID精度丢失处理
 
-![](doc/assets/mall_tiny_start_01.png)
+5. MySQL建表示例
 
-- 化繁为简，仅保留了权限管理功能相关的9张表，方便自由定制；
+6. 常用工具类
 
-- 数据库源文件地址：/doc/sql/mall_tiny.sql
+7. 优化了SecurityConfig，使用流式 API 和 Lambda 表达式
 
-## 使用流程
+8. 代码目录结构规范
 
-### 环境搭建
+   生成的代码遵循行业标准的分层架构：
 
-简化依赖服务，只需安装最常用的MySql和Redis服务即可，数据库中需要导入`mall_tiny.sql`脚本。
+   ```
+   src/main/java/net/xzh/generator/
+   ├── common/                    # 通用模块
+   │   ├── constant/              # 常量定义
+   │   ├── core/                  # 核心工具类
+   │   ├── model/                 # 通用模型（CommonResult, CommonPage等）
+   │   └── utils/                 # 工具类
+   ├── config/                    # 配置类
+   │   └── properties/            # 配置属性类
+   ├── controller/                # 控制层 (API接口)
+   ├── service/                   # 业务逻辑层
+   │   └── impl/                  # 服务实现类
+   ├── mapper/                    # 数据访问层 (Mapper/Repository)
+   ├── model/                     # 数据模型层 (核心实体与数据流转对象)
+   │   ├── entity/                # 数据库表映射对象 (DO)
+   │   ├── dto/                   # 数据传输对象 (DTO)
+   │   ├── request/               # 接口入参对象 (Req)
+   │   ├── convert/               # 对象转换层 (MapStruct/BeanUtils等)
+   │   └── response/              # 接口出参对象 (Resp)
+   └── GeneratorApplication.java  # 启动类
+   ```
 
-### 开发规约
+   **各层职责说明：**
 
-#### 项目包结构
+   | 层级 | 说明 | 典型类名 |
+   |------|------|----------|
+   | controller | REST API控制器 | UserController |
+   | service | 业务接口定义 | UserService |
+   | service/impl | 业务逻辑实现 | UserServiceImpl |
+   | mapper | MyBatis Mapper接口 | UserMapper |
+   | model/entity | 数据库实体，与表结构一一对应 | UserDO |
+   | model/dto | 通用数据传输对象 | UserDTO |
+   | model/request | HTTP请求参数 | UserSaveReq, UserPageQuery |
+   | model/response | HTTP响应结果 | UserListResp, UserDetailResp |
+   | model/convert | 对象转换接口（MapStruct） | UserConvert |
 
-``` lua
-src
-├── common -- 用于存放通用代码
-|   ├── api -- 通用结果集封装类
-|   ├── config -- 通用配置类
-|   ├── domain -- 通用封装对象
-|   ├── exception -- 全局异常处理相关类
-|   └── service -- 通用业务类
-├── config -- SpringBoot中的Java配置
-├── domain -- 共用封装对象
-├── generator -- MyBatis-Plus代码生成器
-├── modules -- 存放业务代码的基础包
-|   └── ums -- 权限管理模块业务代码
-|       ├── controller -- 该模块相关接口
-|       ├── dto -- 该模块数据传输封装对象
-|       ├── mapper -- 该模块相关Mapper接口
-|       ├── model -- 该模块相关实体类
-|       └── service -- 该模块相关业务处理类
-└── security -- SpringSecurity认证授权相关代码
-    ├── component -- 认证授权相关组件
-    ├── config -- 相关配置
-    └── util -- 相关工具类
-```
+   优点：
 
-#### 资源文件说明
+   a. 划分清晰，避免一个类承载过多的职责
+   b. 场景化设计，安全考虑只看必要字段
+   c. 模型层集中管理，便于维护
 
-``` lua
-resources
-├── mapper -- MyBatis中mapper.xml存放位置
-├── application.yml -- SpringBoot通用配置文件
-├── application-dev.yml -- SpringBoot开发环境配置文件
-├── application-prod.yml -- SpringBoot生产环境配置文件
-└── generator.properties -- MyBatis-Plus代码生成器配置
-```
+   潜在问题：
 
-#### 接口定义规则
+   a. 类数量较多，每个实体需要多个DTO类
+   b. 转换逻辑需要维护
 
-- 创建表记录：POST /{控制器路由名称}/create
+   建议：字段差异明显的业务场景，中大型项目，对安全性要求较高的系统使用该方案
 
-- 修改表记录：POST /{控制器路由名称}/update/{id}
 
-- 删除指定表记录：POST /{控制器路由名称}/delete/{id}
+## 模板下载
+http://localhost:8080/generator/code?tables=sys_user
 
-- 分页查询表记录：GET /{控制器路由名称}/list
+## 文档地址
+http://localhost:8080/swagger-ui/index.html
 
-- 获取指定记录详情：GET /{控制器路由名称}/{id}
 
-- 具体参数及返回结果定义可以运行代码查看Swagger-UI的Api文档：http://127.0.0.1:8080/swagger-ui/index.html
-
-![](doc/assets/mall_tiny_start_02.png)
-
-### 项目运行
-
-直接运行启动类`MallTinyApplication`的`main`函数即可。
-
-### 业务代码开发流程
-
-#### 创建业务表
-
-> 创建好`pms`模块的所有表，需要注意的是一定要写好表字段的`注释`，这样实体类和接口文档中就会自动生成字段说明了。
-
-![](doc/assets/mall_tiny_start_03.png)
-
-#### 使用代码生成器
-
-> 运行`MyBatisPlusGenerator`类的main方法来生成代码，可直接生成controller、service、mapper、model、mapper.xml的代码，无需手动创建。
-
-- 代码生成器支持两种模式，一种生成单表的代码，比如只生成`pms_brand`表代码可以先输入`pms`，后输入`pms_brand`；
-
-![](doc/assets/mall_tiny_start_04.png)
-
-- 生成代码结构一览；
-
-![](doc/assets/mall_tiny_start_05.png)
-
-- 另一种直接生成整个模块的代码，比如生成`pms`模块代码可以先输入`pms`，后输入`pms_*`。
-
-![](doc/assets/mall_tiny_start_06.png)
-
-#### 编写业务代码
-
-##### 单表查询
-
-> 由于MyBatis-Plus提供的增强功能相当强大，单表查询几乎不用手写SQL，直接使用ServiceImpl和BaseMapper中提供的方法即可。
-
-比如我们的菜单管理业务实现类`UmsMenuServiceImpl`中的方法都直接使用了这些方法。
-
-```java
-/**
- * 后台菜单管理Service实现类
- */
-@Service
-public class UmsMenuServiceImpl extends ServiceImpl<UmsMenuMapper,UmsMenu>implements UmsMenuService {
-
-    @Override
-    public boolean create(UmsMenu umsMenu) {
-        umsMenu.setCreateTime(new Date());
-        updateLevel(umsMenu);
-        return save(umsMenu);
-    }
-
-    @Override
-    public boolean update(Long id, UmsMenu umsMenu) {
-        umsMenu.setId(id);
-        updateLevel(umsMenu);
-        return updateById(umsMenu);
-    }
-
-    @Override
-    public Page<UmsMenu> list(Long parentId, Integer pageSize, Integer pageNum) {
-        Page<UmsMenu> page = new Page<>(pageNum,pageSize);
-        QueryWrapper<UmsMenu> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(UmsMenu::getParentId,parentId)
-                .orderByDesc(UmsMenu::getSort);
-        return page(page,wrapper);
-    }
-
-    @Override
-    public List<UmsMenuNode> treeList() {
-        List<UmsMenu> menuList = list();
-        List<UmsMenuNode> result = menuList.stream()
-                .filter(menu -> menu.getParentId().equals(0L))
-                .map(menu -> covertMenuNode(menu, menuList)).collect(Collectors.toList());
-        return result;
-    }
-
-    @Override
-    public boolean updateHidden(Long id, Integer hidden) {
-        UmsMenu umsMenu = new UmsMenu();
-        umsMenu.setId(id);
-        umsMenu.setHidden(hidden);
-        return updateById(umsMenu);
-    }
-}
-```
-
-##### 分页查询
-
-> 对于分页查询MyBatis-Plus原生支持，不需要再整合其他插件，直接构造Page对象，然后调用ServiceImpl中的page方法即可。
-
-```java
-/**
- * 后台菜单管理Service实现类
- */
-@Service
-public class UmsMenuServiceImpl extends ServiceImpl<UmsMenuMapper,UmsMenu>implements UmsMenuService {
-    @Override
-    public Page<UmsMenu> list(Long parentId, Integer pageSize, Integer pageNum) {
-        Page<UmsMenu> page = new Page<>(pageNum,pageSize);
-        QueryWrapper<UmsMenu> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(UmsMenu::getParentId,parentId)
-                .orderByDesc(UmsMenu::getSort);
-        return page(page,wrapper);
-    }
-}
-```
-
-##### 多表查询
-
-> 对于多表查询，我们需要手写mapper.xml中的SQL实现，由于之前我们已经生成了mapper.xml文件，所以我们直接在Mapper接口中定义好方法，然后在mapper.xml写好SQL实现即可。
-
-- 比如说我们需要写一个根据用户ID获取其分配的菜单的方法，首先我们在`UmsMenuMapper`接口中添加好`getMenuList`方法；
-
-```java
-/**
- * <p>
- * 后台菜单表 Mapper 接口
- * </p>
- *
- * @author CR7
- */
-public interface UmsMenuMapper extends BaseMapper<UmsMenu> {
-
-    /**
-     * 根据后台用户ID获取菜单
-     */
-    List<UmsMenu> getMenuList(@Param("adminId") Long adminId);
-
-}
-```
-
-- 然后在`UmsMenuMapper.xml`添加该方法的对应SQL实现即可。
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="UmsMenuMapper">
-
-    <select id="getMenuList" resultType="UmsMenu">
-        SELECT
-            m.id id,
-            m.parent_id parentId,
-            m.create_time createTime,
-            m.title title,
-            m.level level,
-            m.sort sort,
-            m.name name,
-            m.icon icon,
-            m.hidden hidden
-        FROM
-            ums_admin_role_relation arr
-                LEFT JOIN ums_role r ON arr.role_id = r.id
-                LEFT JOIN ums_role_menu_relation rmr ON r.id = rmr.role_id
-                LEFT JOIN ums_menu m ON rmr.menu_id = m.id
-        WHERE
-            arr.admin_id = #{adminId}
-          AND m.id IS NOT NULL
-        GROUP BY
-            m.id
-    </select>
-    
-</mapper>
-```
-
-### 项目部署
-
-使用gradle构建
-
-### 其他说明
-
-#### SpringSecurity相关
-
-> 由于使用了SpringSecurity来实现认证和授权，部分接口需要token才可以访问，访问需要认证授权接口流程如下。
-
-- 访问Swagger-UI接口文档：http://localhost:8080/swagger-ui/
-
-- 调用登录接口获取token；
-
-![](doc/assets/mall_tiny_start_07.png)
-
-- 点击右上角Authorize按钮输入token，然后访问相关接口即可。
-
-![](doc/assets/mall_tiny_start_08.png)
-
-#### 请求参数校验
-
-> 默认集成了`Jakarta Bean Validation`参数校验框架，只需在参数对象属性中添加`javax.validation.constraints`包中的注解注解即可实现校验功能，这里以登录参数校验为例。
-
-- 首先在登录请求参数中添加`@NotEmpty`注解；
-
-```java
-/**
- * 用户登录参数
- * Created by CR7
- */
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class UmsAdminLoginParam {
-    @NotEmpty
-    @ApiModelProperty(value = "用户名",required = true)
-    private String username;
-    @NotEmpty
-    @ApiModelProperty(value = "密码",required = true)
-    private String password;
-}
-```
-
-- 然后在登录接口中添加`@Validated`注解开启参数校验功能即可。
-
-```java
-/**
- * 后台用户管理
- * Created by CR7
- */
-@Controller
-@Api(tags = "UmsAdminController", description = "后台用户管理")
-@RequestMapping("/admin")
-public class UmsAdminController {
-
-    @ApiOperation(value = "登录以后返回token")
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    @ResponseBody
-    public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLoginParam) {
-        String token = adminService.login(umsAdminLoginParam.getUsername(), umsAdminLoginParam.getPassword());
-        if (token == null) {
-            return CommonResult.validateFailed("用户名或密码错误");
-        }
-        Map<String, String> tokenMap = new HashMap<>();
-        tokenMap.put("token", token);
-        tokenMap.put("tokenHead", tokenHead);
-        return CommonResult.success(tokenMap);
-    }
-}
-```
