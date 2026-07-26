@@ -27,6 +27,7 @@
 
 ## 3. 三方Starter
 
+- [【文档】 MyBatis-Plus 快速开发脚手架 + 代码生成器](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-mybatis-plus)
 - [整合 CXF 发布 WebService 以及调用的方法](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-webservice)
 - [整合 Dubbo 调用示例](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-dubbo)
 - [【文档】整合 SpringDoc 文档生成工具](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-springdoc)
@@ -68,7 +69,6 @@
 - [基于 Elasticsearch 技术栈实现统一日志收集](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-elk)
 - [SockJS + STOMP + RabbitMQ 实时聊天](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sockjs)
 - [SockJS + STOMP + Redis 聊天集群](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-sockjs-redis)
-- [【文档】基于 MyBatis-Plus 快速开发脚手架](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-mybatis-plus)
 - [整合 Activiti 工作流设计器和数据验证分组校验](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-activiti)
 - [YAML 格式校验](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-yaml)
 
@@ -78,7 +78,6 @@
 
 > 不依赖中间件、服务框架的工具集合
 
-- [【文档】Mybatis 代码生成器](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-generator)
 - [使用 Maven 插件构建 Docker 镜像,并推送到 Harbor 仓库](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-harbor)
 - [使用 Filter 防范 XSS 攻击和伪造 Referrer 拦截](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-xss)
 - [API 版本控制](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-api-version)
