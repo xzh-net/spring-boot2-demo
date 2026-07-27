@@ -9,7 +9,7 @@ import net.xzh.generator.model.entity.SysUserDO;
  * 用户管理数据库访问对象
  * 
  * @author xzh
- * @date 2026-07-27 08:40:33
+ * @date 2026-07-27 09:21:37
  */
 @Mapper
 @Repository

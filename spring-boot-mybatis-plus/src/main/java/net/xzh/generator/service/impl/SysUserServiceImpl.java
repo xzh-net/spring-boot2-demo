@@ -22,61 +22,43 @@ import java.util.List;
  * 用户管理服务接口实现
  *
  * @author xzh
- * @date 2026-07-27 08:40:33
+ * @date 2026-07-27 09:21:37
  */
 @Service
 public class SysUserServiceImpl extends SuperServiceImpl<SysUserMapper, SysUserDO> implements SysUserService {
 
-	@Override
-	public void save(SysUserSaveReq form) {
-		save(SysUserConvert.INSTANCE.convert(form));
-	}
+    @Override
+    public void save(SysUserSaveReq form) {
+        save(SysUserConvert.INSTANCE.convert(form));
+    }
 
-	@Override
-	public void edit(Long id, SysUserSaveReq form) {
-		SysUserDO sysUserDo = SysUserConvert.INSTANCE.convert(form);
-		sysUserDo.setId(id);
-		updateById(sysUserDo);
-	}
+    @Override
+    public void edit(Long id, SysUserSaveReq form) {
+        SysUserDO sysUserDo = SysUserConvert.INSTANCE.convert(form);
+        sysUserDo.setId(id);
+        updateById(sysUserDo);
+    }
 
-	@Override
-	public SysUserDetailResp get(Long id) {
-		return SysUserConvert.INSTANCE.convert(getById(id));
-	}
+    @Override
+    public SysUserDetailResp get(Long id) {
+        return SysUserConvert.INSTANCE.convert(getById(id));
+    }
 
-	@Override
-	public PageResult<SysUserListResp> page(SysUserPageQuery query) {
-		LambdaQueryWrapper<SysUserDO> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.like(StringUtils.isNotEmpty(query.getUsername()), SysUserDO::getUsername, query.getUsername())
-				.like(StringUtils.isNotEmpty(query.getPassword()), SysUserDO::getPassword, query.getPassword())
-				.like(StringUtils.isNotEmpty(query.getNickname()), SysUserDO::getNickname, query.getNickname())
-				.like(StringUtils.isNotEmpty(query.getHeadImgUrl()), SysUserDO::getHeadImgUrl, query.getHeadImgUrl())
-				.like(StringUtils.isNotEmpty(query.getMobile()), SysUserDO::getMobile, query.getMobile())
-				.like(StringUtils.isNotEmpty(query.getEmail()), SysUserDO::getEmail, query.getEmail())
-				.eq(query.getAccountBalance() != null, SysUserDO::getAccountBalance, query.getAccountBalance())
-				.eq(query.getStatus() != null, SysUserDO::getStatus, query.getStatus())
-				.eq(query.getRegistTime() != null, SysUserDO::getRegistTime, query.getRegistTime())
-				.eq(query.getSortBy() != null, SysUserDO::getSortBy, query.getSortBy());
-		Page<SysUserDO> page = new Page<>(query.getPageNum(), query.getPageSize());
-		IPage<SysUserDO> iPage = page(page, queryWrapper);
-		return PageResult.restPage(iPage, SysUserConvert.INSTANCE.convertList(iPage.getRecords()));
-	}
+    @Override
+    public PageResult<SysUserListResp> page(SysUserPageQuery query) {
+        LambdaQueryWrapper<SysUserDO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper                .like(StringUtils.isNotEmpty(query.getUsername()), SysUserDO::getUsername, query.getUsername())                .like(StringUtils.isNotEmpty(query.getPassword()), SysUserDO::getPassword, query.getPassword())                .like(StringUtils.isNotEmpty(query.getNickname()), SysUserDO::getNickname, query.getNickname())                .like(StringUtils.isNotEmpty(query.getHeadImgUrl()), SysUserDO::getHeadImgUrl, query.getHeadImgUrl())                .like(StringUtils.isNotEmpty(query.getMobile()), SysUserDO::getMobile, query.getMobile())                .like(StringUtils.isNotEmpty(query.getEmail()), SysUserDO::getEmail, query.getEmail())                .eq(query.getAccountBalance() != null, SysUserDO::getAccountBalance, query.getAccountBalance())                .eq(query.getStatus() != null, SysUserDO::getStatus, query.getStatus())                .eq(query.getRegistTime() != null, SysUserDO::getRegistTime, query.getRegistTime())                .eq(query.getSortBy() != null, SysUserDO::getSortBy, query.getSortBy())        ;
+        Page<SysUserDO> page = new Page<>(query.getPageNum(), query.getPageSize());
+        IPage<SysUserDO> iPage = page(page, queryWrapper);
+        return PageResult.restPage(iPage, SysUserConvert.INSTANCE.convertList(iPage.getRecords()));
+    }
 
-	@Override
-	public List<SysUserListResp> listAll(SysUserPageQuery query) {
-		LambdaQueryWrapper<SysUserDO> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.like(StringUtils.isNotEmpty(query.getUsername()), SysUserDO::getUsername, query.getUsername())
-				.like(StringUtils.isNotEmpty(query.getPassword()), SysUserDO::getPassword, query.getPassword())
-				.like(StringUtils.isNotEmpty(query.getNickname()), SysUserDO::getNickname, query.getNickname())
-				.like(StringUtils.isNotEmpty(query.getHeadImgUrl()), SysUserDO::getHeadImgUrl, query.getHeadImgUrl())
-				.like(StringUtils.isNotEmpty(query.getMobile()), SysUserDO::getMobile, query.getMobile())
-				.like(StringUtils.isNotEmpty(query.getEmail()), SysUserDO::getEmail, query.getEmail())
-				.eq(query.getAccountBalance() != null, SysUserDO::getAccountBalance, query.getAccountBalance())
-				.eq(query.getStatus() != null, SysUserDO::getStatus, query.getStatus())
-				.eq(query.getRegistTime() != null, SysUserDO::getRegistTime, query.getRegistTime())
-				.eq(query.getSortBy() != null, SysUserDO::getSortBy, query.getSortBy());
-		List<SysUserDO> list = list(queryWrapper);
-		return SysUserConvert.INSTANCE.convertList(list);
-	}
-
+    @Override
+    public List<SysUserListResp> listAll(SysUserPageQuery query) {
+        LambdaQueryWrapper<SysUserDO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper                .like(StringUtils.isNotEmpty(query.getUsername()), SysUserDO::getUsername, query.getUsername())                .like(StringUtils.isNotEmpty(query.getPassword()), SysUserDO::getPassword, query.getPassword())                .like(StringUtils.isNotEmpty(query.getNickname()), SysUserDO::getNickname, query.getNickname())                .like(StringUtils.isNotEmpty(query.getHeadImgUrl()), SysUserDO::getHeadImgUrl, query.getHeadImgUrl())                .like(StringUtils.isNotEmpty(query.getMobile()), SysUserDO::getMobile, query.getMobile())                .like(StringUtils.isNotEmpty(query.getEmail()), SysUserDO::getEmail, query.getEmail())                .eq(query.getAccountBalance() != null, SysUserDO::getAccountBalance, query.getAccountBalance())                .eq(query.getStatus() != null, SysUserDO::getStatus, query.getStatus())                .eq(query.getRegistTime() != null, SysUserDO::getRegistTime, query.getRegistTime())                .eq(query.getSortBy() != null, SysUserDO::getSortBy, query.getSortBy())        ;
+        List<SysUserDO> list = list(queryWrapper);
+        return SysUserConvert.INSTANCE.convertList(list);
+    }
+    
 }

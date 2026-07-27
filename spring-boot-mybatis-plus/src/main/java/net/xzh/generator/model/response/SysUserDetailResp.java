@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 用户管理详情返回对象
  *
  * @author xzh
- * @date 2026-07-27 08:40:33
+ * @date 2026-07-27 09:21:37
  */
 @Data
 @Schema(description = "用户管理详情返回对象")
