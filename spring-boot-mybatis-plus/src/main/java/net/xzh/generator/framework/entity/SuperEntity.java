@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * 持久层PO多业务字段通用实体
+ * 持久层DO多业务字段通用实体
  * 
  * @author xzh
  *

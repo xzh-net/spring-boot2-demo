@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * 用户管理数据传输对象
  *
  * @author xzh
- * @date 2026-07-26 17:02:53
+ * @date 2026-07-27 08:40:33
  */
 @Data
 @Schema(description = "用户管理数据传输对象")

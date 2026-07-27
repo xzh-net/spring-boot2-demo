@@ -3,7 +3,7 @@ package net.xzh.generator.model.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.xzh.generator.common.model.BasePage;
+import net.xzh.generator.common.vo.BasePage;
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * 用户管理分页查询条件
  *
  * @author xzh
- * @date 2026-07-26 17:02:53
+ * @date 2026-07-27 08:40:33
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

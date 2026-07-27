@@ -15,7 +15,6 @@ import net.xzh.generator.service.GeneratorService;
 /**
  * GenUtils测试用例
  *
- * @author zlt
  * @date 2019/5/10
  */
 @SpringBootTest

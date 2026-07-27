@@ -1,4 +1,4 @@
-package net.xzh.generator.common.model;
+package net.xzh.generator.common.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

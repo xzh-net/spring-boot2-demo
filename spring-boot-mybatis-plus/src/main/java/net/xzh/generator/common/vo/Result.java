@@ -1,10 +1,12 @@
-package net.xzh.generator.common.model;
+package net.xzh.generator.common.vo;
 
 import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import net.xzh.generator.common.enums.CodeEnum;
 
 /**
  * 通用结果集
@@ -14,15 +16,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Result<T> implements Serializable {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	private T datas;
-    private Integer resp_code;
-    private String resp_msg;
+	private T data;
+	private Integer code;
+	private String message;
 
-    public static <T> Result<T> success(String msg) {
+	public static <T> Result<T> success(String msg) {
 		return of(null, CodeEnum.SUCCESS.getCode(), msg);
 	}
 
@@ -34,8 +33,8 @@ public class Result<T> implements Serializable {
 		return of(model, CodeEnum.SUCCESS.getCode(), "");
 	}
 
-	public static <T> Result<T> of(T datas, Integer code, String msg) {
-		return new Result<>(datas, code, msg);
+	public static <T> Result<T> of(T data, Integer code, String message) {
+		return new Result<>(data, code, message);
 	}
 
 	public static <T> Result<T> failed(String msg) {

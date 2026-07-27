@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +17,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -31,6 +33,7 @@ import net.xzh.generator.model.entity.TableEntity;
  *
  * @author zlt
  */
+@SuppressWarnings("deprecation")
 @Slf4j
 public class GenUtils {
 	private GenUtils() {
@@ -183,7 +186,7 @@ public class GenUtils {
 		map.put(MODULE_NAME, config.getString(MODULE_NAME));
 		map.put("author", config.getString("author"));
 		map.put("email", config.getString("email"));
-		map.put("datetime", DateUtils.getTime());
+		map.put("datetime", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
 		VelocityContext context = new VelocityContext(map);
 
 		// 获取模板列表

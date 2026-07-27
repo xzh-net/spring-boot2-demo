@@ -1,8 +1,8 @@
 package ${package}.${moduleName}.service.impl;
 
 import org.springframework.stereotype.Service;
-import ${package}.${moduleName}.common.model.PageResult;
-import ${package}.${moduleName}.common.utils.StringUtils;
+import ${package}.${moduleName}.common.vo.PageResult;
+import org.apache.commons.lang3.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
-public class DateMetaObjectHandler implements MetaObjectHandler {
+public class MyMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {

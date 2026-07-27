@@ -1,79 +1,98 @@
-# MyBatis-Plus 代码生成【无认证】
+# MyBatis-Plus 代码生成脚手架
 
-该项目同其它开发脚手架的主要封装区别：增加了`SuperMapper`和`SuperServiceImpl`的扩展。分别可以扩展逻辑恢复、物理删除，以及幂等+分布式锁的处理
+基于 Spring Boot 2.x + MyBatis-Plus 的后端代码生成脚手架，支持快速生成完整的 CRUD 代码结构。
 
-1. 使用Velocity模板生成代码
+## 技术特性
 
-2. SpringDoc整合
+- **Velocity 模板引擎**：灵活的代码生成模板
+- **SpringDoc OpenAPI**：自动生成 API 文档
+- **MyBatis-Plus IService**：增删改查统一使用 Service 层实现
+- **雪花算法 ID**：全局唯一 ID 生成
+- **逻辑删除支持**：MyBatis-Plus 逻辑删除配置
+- **自动填充**：`createTime`、`updateTime`、`delFlag` 字段自动填充
+- **AuditLog 切面**：审计日志注解支持
+- **Jackson 多格式时间解析**：支持 ISO-8601、`yyyy-MM-dd HH:mm:ss` 等多种格式
 
-3. MyBatis-Plus增删改使用IService实现
+## 项目结构
 
-4. 雪花ID精度丢失处理
+```
+src/main/java/net/xzh/generator/
+├── common/                          # 通用模块
+│   ├── enums/                       # 枚举类 (BusinessType, CodeEnum)
+│   ├── utils/                       # 工具类 (Convert, GenUtils)
+│   └── vo/                          # 值对象 (BasePage, PageResult, Result)
+├── controller/                      # 控制层
+├── framework/                       # 框架层
+│   ├── aspectj/                     # AOP 切面
+│   │   ├── annotation/              # 注解定义 (AuditLog)
+│   │   └── aspect/                  # 切面实现 (AuditLogAspect)
+│   ├── config/                      # 配置类
+│   │   ├── properties/              # 配置属性 (IgnoreUrlsProperties)
+│   │   ├── JacksonConfig.java       # Jackson 配置
+│   │   ├── MybatisPlusConfig.java   # MyBatis-Plus 配置
+│   │   ├── MyMetaObjectHandler.java # 自动填充处理器
+│   │   ├── SecurityConfig.java      # Spring Security 配置
+│   │   └── WebMvcConfig.java        # Web MVC 配置
+│   ├── entity/                      # 基础实体类 (SuperEntity)
+│   ├── repository/                  # 基础 Mapper (SuperMapper)
+│   └── service/                     # 基础 Service (SuperService)
+├── mapper/                          # 数据访问层
+├── model/                           # 数据模型层
+│   ├── convert/                     # 对象转换 (MapStruct)
+│   ├── dto/                         # 数据传输对象
+│   ├── entity/                      # 数据库实体 (DO)
+│   ├── request/                     # 请求参数
+│   └── response/                    # 响应结果
+├── service/                         # 业务逻辑层
+│   └── impl/                        # 服务实现类
+└── GeneratorApplication.java        # 启动类
+```
 
-5. MySQL建表示例
+## 代码规范
 
-6. 常用工具类
+| 规范项 | 要求 |
+|--------|------|
+| 实体类后缀 | 使用 `DO`（Data Object） |
+| 时间字段类型 | `java.time.LocalDateTime` |
+| ID 生成策略 | 全局 `ASSIGN_ID`（雪花算法） |
+| 数据库字段映射 | `head_img_url` → `headImgUrl` |
+| JSON 序列化格式 | `yyyy-MM-dd HH:mm:ss` |
 
-7. 优化了SecurityConfig，使用流式 API 和 Lambda 表达式
+## 使用方式
 
-8. 代码目录结构规范
+### 1. 代码生成
 
-   生成的代码遵循行业标准的分层架构：
+访问以下 URL 生成指定表的代码：
 
-   ```
-   src/main/java/net/xzh/generator/
-   ├── common/                    # 通用模块
-   │   ├── constant/              # 常量定义
-   │   ├── core/                  # 核心工具类
-   │   ├── model/                 # 通用模型（CommonResult, CommonPage等）
-   │   └── utils/                 # 工具类
-   ├── config/                    # 配置类
-   │   └── properties/            # 配置属性类
-   ├── controller/                # 控制层 (API接口)
-   ├── service/                   # 业务逻辑层
-   │   └── impl/                  # 服务实现类
-   ├── mapper/                    # 数据访问层 (Mapper/Repository)
-   ├── model/                     # 数据模型层 (核心实体与数据流转对象)
-   │   ├── entity/                # 数据库表映射对象 (DO)
-   │   ├── dto/                   # 数据传输对象 (DTO)
-   │   ├── request/               # 接口入参对象 (Req)
-   │   ├── convert/               # 对象转换层 (MapStruct/BeanUtils等)
-   │   └── response/              # 接口出参对象 (Resp)
-   └── GeneratorApplication.java  # 启动类
-   ```
-
-   **各层职责说明：**
-
-   | 层级 | 说明 | 典型类名 |
-   |------|------|----------|
-   | controller | REST API控制器 | UserController |
-   | service | 业务接口定义 | UserService |
-   | service/impl | 业务逻辑实现 | UserServiceImpl |
-   | mapper | MyBatis Mapper接口 | UserMapper |
-   | model/entity | 数据库实体，与表结构一一对应 | UserDO |
-   | model/dto | 通用数据传输对象 | UserDTO |
-   | model/request | HTTP请求参数 | UserSaveReq, UserPageQuery |
-   | model/response | HTTP响应结果 | UserListResp, UserDetailResp |
-   | model/convert | 对象转换接口（MapStruct） | UserConvert |
-
-   优点：
-
-   a. 划分清晰，避免一个类承载过多的职责
-   b. 场景化设计，安全考虑只看必要字段
-   c. 模型层集中管理，便于维护
-
-   潜在问题：
-
-   a. 类数量较多，每个实体需要多个DTO类
-   b. 转换逻辑需要维护
-
-   建议：字段差异明显的业务场景，中大型项目，对安全性要求较高的系统使用该方案
-
-
-## 模板下载
+```
 http://localhost:8080/generator/code?tables=sys_user
+```
 
-## 文档地址
+### 2. API 文档
+
+启动项目后访问 Swagger UI：
+
+```
 http://localhost:8080/swagger-ui/index.html
+```
 
+## 核心配置说明
 
+### 自动填充字段
+
+`MyMetaObjectHandler` 自动填充以下字段：
+
+- `createTime`：INSERT 时自动填充当前时间
+- `updateTime`：INSERT 和 UPDATE 时自动填充当前时间
+- `delFlag`：INSERT 时默认填充 `0`
+
+### Jackson 时间格式
+
+支持多种时间格式反序列化：
+- `ISO_LOCAL_DATE_TIME`
+- `ISO_OFFSET_DATE_TIME`
+- `yyyy-MM-dd HH:mm:ss`
+- `yyyy-MM-dd HH:mm:ss.SSS`
+- `yyyy-MM-dd`
+
+输出格式统一为：`yyyy-MM-dd HH:mm:ss`

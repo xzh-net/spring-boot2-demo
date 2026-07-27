@@ -27,7 +27,7 @@
 
 ## 3. 三方Starter
 
-- [【文档】 MyBatis-Plus 快速开发脚手架 + 代码生成器](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-mybatis-plus)
+- [【文档】 MyBatis-Plus 代码生成脚手架](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-mybatis-plus)
 - [整合 CXF 发布 WebService 以及调用的方法](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-webservice)
 - [整合 Dubbo 调用示例](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-dubbo)
 - [【文档】整合 SpringDoc 文档生成工具](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-springdoc)

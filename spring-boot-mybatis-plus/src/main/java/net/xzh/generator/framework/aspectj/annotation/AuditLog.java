@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import net.xzh.generator.common.model.BusinessType;
+import net.xzh.generator.common.enums.BusinessType;
 
 /**
  * 自定义注解：用于标记需要审计日志的方法或类 该注解可以用于类和方法上，运行时保留，并且会被包含在JavaDoc中

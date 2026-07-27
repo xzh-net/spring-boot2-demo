@@ -5,7 +5,7 @@ import ${package}.${moduleName}.model.response.${className}DetailResp;
 import ${package}.${moduleName}.model.request.${className}PageQuery;
 import ${package}.${moduleName}.model.request.${className}SaveReq;
 import ${package}.${moduleName}.model.response.${className}ListResp;
-import ${package}.${moduleName}.common.model.PageResult;
+import ${package}.${moduleName}.common.vo.PageResult;
 import ${package}.${moduleName}.framework.service.SuperService;
 
 import java.util.List;

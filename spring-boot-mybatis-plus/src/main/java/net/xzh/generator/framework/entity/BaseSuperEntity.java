@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 持久层PO单主键基础实体
+ * 持久层DO单主键基础实体
  *
  * @param <T> 泛型类型，必须继承自Model
  */

@@ -1,4 +1,4 @@
-package net.xzh.generator.common.model;
+package net.xzh.generator.common.enums;
 
 /**
  * 枚举了一些常用API操作码
