@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: rsa-aes-demo
+  mvc:
+    static-path-pattern: /**
+
+logging:
+  level:
+    net.xzh.rsa: DEBUG

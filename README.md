@@ -78,6 +78,7 @@
 
 > 不依赖中间件、服务框架的工具集合
 
+- [使用 RSA+AES 混合加密实现零侵入式接口加密](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-rsa)
 - [使用 Maven 插件构建 Docker 镜像,并推送到 Harbor 仓库](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-harbor)
 - [使用 Filter 防范 XSS 攻击和伪造 Referrer 拦截](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-xss)
 - [API 版本控制](https://github.com/xzh-net/spring-boot2-demo/tree/main/spring-boot-api-version)

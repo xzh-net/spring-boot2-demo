@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>RSA + AES 加密方案测试</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background: #f5f7fa; }
+        h1 { margin-bottom: 20px; color: #333; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .panel { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .panel h2 { margin-bottom: 12px; font-size: 16px; color: #555; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 10px; }
+        .btn-primary { background: #409eff; color: #fff; }
+        .btn-primary:hover { background: #66b1ff; }
+        .btn-success { background: #67c23a; color: #fff; }
+        .btn-success:hover { background: #85ce61; }
+        pre { background: #f7f7f7; padding: 12px; border-radius: 4px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+        .step { display: flex; align-items: flex-start; margin-bottom: 10px; }
+        .step-num { background: #409eff; color: #fff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 10px; flex-shrink: 0; }
+        .step-content { flex: 1; }
+        .step-content h3 { font-size: 14px; margin-bottom: 4px; color: #333; }
+        .step-content p { font-size: 12px; color: #888; margin-bottom: 8px; }
+        .log-section { display: none; }
+        .log-section.show { display: block; }
+        .log-toggle { cursor: pointer; color: #409eff; font-size: 12px; user-select: none; }
+        .status { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; margin-left: 8px; }
+        .status.ok { background: #e1f3d8; color: #67c23a; }
+        .status.fail { background: #fde2e2; color: #f56c6c; }
+        .status.pending { background: #f0f0f0; color: #999; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>RSA + AES 混合加密方案测试</h1>
+
+    <div class="panel">
+        <h2>步骤 1: 获取 RSA 公钥</h2>
+        <button class="btn btn-primary" onclick="fetchPublicKey()">获取公钥</button>
+        <span id="keyStatus" class="status pending">待获取</span>
+        <div id="publicKeyOutput" style="margin-top: 10px; display: none;">
+            <div class="log-toggle" onclick="toggleLog('keyLog')">点击查看公钥详情 ▼</div>
+            <div id="keyLog" class="log-section">
+                <pre id="publicKeyPre"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>步骤 2: 发送加密请求获取用户列表</h2>
+        <button class="btn btn-success" onclick="sendEncryptedRequest()">发送加密请求</button>
+        <span id="requestStatus" class="status pending">待发送</span>
+
+        <div style="margin-top: 15px;">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h3>生成随机 AES 密钥和 IV</h3>
+                    <p>AES Key: 32字节, IV: 16字节</p>
+                    <div class="log-toggle" onclick="toggleLog('genAesLog')">详情 ▼</div>
+                    <div id="genAesLog" class="log-section"><pre id="aesKeyPre"></pre></div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h3>RSA 公钥加密 AES 密钥</h3>
+                    <p>使用 RSA/ECB/PKCS1Padding</p>
+                    <div class="log-toggle" onclick="toggleLog('rsaLog')">详情 ▼</div>
+                    <div id="rsaLog" class="log-section"><pre id="rsaEncryptedPre"></pre></div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h3>AES 加密请求体 + HMAC 签名</h3>
+                    <p>AES/CBC/PKCS7Padding + HMAC-SHA256</p>
+                    <div class="log-toggle" onclick="toggleLog('aesLog')">详情 ▼</div>
+                    <div id="aesLog" class="log-section"><pre id="aesEncryptedPre"></pre></div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <h3>发送加密请求到 /api/user/list</h3>
+                    <p>服务器解密后处理，加密响应返回</p>
+                    <div class="log-toggle" onclick="toggleLog('respLog')">请求/响应详情 ▼</div>
+                    <div id="respLog" class="log-section"><pre id="requestRespPre"></pre></div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                    <h3>客户端校验签名 + AES 解密响应</h3>
+                    <div class="log-toggle" onclick="toggleLog('decryptLog')">解密详情 ▼</div>
+                    <div id="decryptLog" class="log-section"><pre id="decryptedPre"></pre></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>最终用户列表</h2>
+        <div id="userList" style="color: #999; font-size: 13px;">等待请求...</div>
+    </div>
+</div>
+
+<script>
+    let cachedPublicKey = null;
+    let currentAesKey = null;
+
+    function toggleLog(id) {
+        document.getElementById(id).classList.toggle('show');
+    }
+
+    function setStatus(id, text, cls) {
+        const el = document.getElementById(id);
+        el.textContent = text;
+        el.className = 'status ' + cls;
+    }
+
+    function formatJson(obj) {
+        if (typeof obj === 'string') {
+            try { obj = JSON.parse(obj); } catch(e) {}
+        }
+        return JSON.stringify(obj, null, 2);
+    }
+
+    function formatPemKey(base64) {
+        const header = '-----BEGIN PUBLIC KEY-----';
+        const footer = '-----END PUBLIC KEY-----';
+        let body = base64;
+        let result = header + '\n';
+        while (body.length > 64) {
+            result += body.substring(0, 64) + '\n';
+            body = body.substring(64);
+        }
+        result += body + '\n' + footer;
+        return result;
+    }
+
+    function generateAesKey() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        const array = new Uint32Array(32);
+        crypto.getRandomValues(array);
+        for (let i = 0; i < 32; i++) {
+            result += chars.charAt(array[i] % chars.length);
+        }
+        return result;
+    }
+
+    function generateIv() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        const array = new Uint32Array(16);
+        crypto.getRandomValues(array);
+        for (let i = 0; i < 16; i++) {
+            result += chars.charAt(array[i] % chars.length);
+        }
+        return result;
+    }
+
+    function fetchPublicKey() {
+        setStatus('keyStatus', '获取中...', 'pending');
+        fetch('/api/publicKey')
+            .then(r => r.json())
+            .then(res => {
+                if (res.code === 0 && res.data && res.data.publicKey) {
+                    cachedPublicKey = res.data.publicKey;
+                    document.getElementById('publicKeyOutput').style.display = 'block';
+                    document.getElementById('publicKeyPre').textContent = cachedPublicKey;
+                    setStatus('keyStatus', '获取成功', 'ok');
+                } else {
+                    setStatus('keyStatus', '获取失败', 'fail');
+                }
+            })
+            .catch(err => {
+                setStatus('keyStatus', '请求错误: ' + err.message, 'fail');
+            });
+    }
+
+    function sendEncryptedRequest() {
+        if (!cachedPublicKey) {
+            alert('请先获取 RSA 公钥');
+            return;
+        }
+
+        setStatus('requestStatus', '加密中...', 'pending');
+
+        // Step 1: 生成 AES 密钥和 IV
+        const aesKey = generateAesKey();
+        const iv = generateIv();
+        currentAesKey = aesKey;
+
+        document.getElementById('aesKeyPre').textContent =
+            'AES Key: ' + aesKey + '\nIV: ' + iv;
+        document.getElementById('genAesLog').classList.add('show');
+
+        // Step 2: RSA 加密 AES 密钥
+        const encrypt = new JSEncrypt();
+        encrypt.setPublicKey(formatPemKey(cachedPublicKey));
+        const encryptedKey = encrypt.encrypt(aesKey);
+        if (!encryptedKey) {
+            setStatus('requestStatus', 'RSA 加密失败', 'fail');
+            return;
+        }
+        document.getElementById('rsaEncryptedPre').textContent = encryptedKey;
+        document.getElementById('rsaLog').classList.add('show');
+
+        // Step 3: AES 加密请求体
+        const requestData = JSON.stringify({ query: 'users' });
+        const encryptedData = CryptoJS.AES.encrypt(
+            requestData,
+            CryptoJS.enc.Utf8.parse(aesKey),
+            {
+                iv: CryptoJS.enc.Utf8.parse(iv),
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            }
+        ).toString();
+
+        // HMAC-SHA256 签名
+        const signWords = CryptoJS.HmacSHA256(encryptedData, aesKey);
+        const sign = CryptoJS.enc.Base64.stringify(signWords);
+
+        document.getElementById('aesEncryptedPre').textContent =
+            '明文请求: ' + requestData + '\n\n' +
+            'IV: ' + iv + '\n\n' +
+            'encryptedData (Base64):\n' + encryptedData + '\n\n' +
+            '签名 (HMAC-SHA256): ' + sign;
+        document.getElementById('aesLog').classList.add('show');
+
+        const cryptoRequest = {
+            encryptedKey: encryptedKey,
+            encryptedData: encryptedData,
+            iv: iv,
+            sign: sign
+        };
+
+        setStatus('requestStatus', '发送请求中...', 'pending');
+
+        // Step 4: 发送加密请求
+        fetch('/api/user/list', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(cryptoRequest),
+            credentials: 'same-origin'
+        })
+            .then(response => response.json())
+            .then(resp => {
+                document.getElementById('requestRespPre').textContent =
+                    '原始响应:\n' + formatJson(resp);
+                document.getElementById('respLog').classList.add('show');
+
+                if (resp.code !== undefined && resp.encryptedData !== undefined) {
+                    handleEncryptedResponse(resp);
+                } else if (resp.code === 0 && resp.data) {
+                    // 非加密响应（服务器可能返回了明文错误）
+                    setStatus('requestStatus', '收到非加密响应（可能是错误）', 'fail');
+                    document.getElementById('userList').innerHTML =
+                        '<pre>' + formatJson(resp) + '</pre>';
+                } else {
+                    handleEncryptedResponse(resp);
+                }
+            })
+            .catch(err => {
+                setStatus('requestStatus', '请求错误: ' + err.message, 'fail');
+            });
+    }
+
+    function handleEncryptedResponse(cryptoResponse) {
+        try {
+            const aesKey = currentAesKey;
+            const encryptedData = cryptoResponse.encryptedData;
+            const iv = cryptoResponse.iv;
+            const sign = cryptoResponse.sign;
+
+            // Step 5: 校验 HMAC 签名
+            const expectedSign = CryptoJS.enc.Base64.stringify(
+                CryptoJS.HmacSHA256(encryptedData, aesKey)
+            );
+
+            const signValid = expectedSign === sign;
+            if (!signValid) {
+                document.getElementById('decryptedPre').textContent =
+                    '⚠️ 签名校验失败!\n预期签名: ' + expectedSign + '\n实际签名: ' + sign;
+                document.getElementById('decryptLog').classList.add('show');
+                setStatus('requestStatus', '签名校验失败', 'fail');
+                return;
+            }
+
+            // AES 解密
+            const decrypted = CryptoJS.AES.decrypt(
+                encryptedData,
+                CryptoJS.enc.Utf8.parse(aesKey),
+                {
+                    iv: CryptoJS.enc.Utf8.parse(iv),
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                }
+            );
+            const plainText = decrypted.toString(CryptoJS.enc.Utf8);
+            const parsed = JSON.parse(plainText);
+
+            document.getElementById('decryptedPre').textContent =
+                '✅ 签名校验通过\n' +
+                'IV: ' + iv + '\n\n' +
+                '解密后的明文:\n' + formatJson(parsed);
+            document.getElementById('decryptLog').classList.add('show');
+
+            setStatus('requestStatus', '成功', 'ok');
+
+            // 渲染用户列表
+            let html = '';
+            if (parsed.code === 0 && parsed.data) {
+                html = '<table style="width:100%; border-collapse:collapse;">' +
+                    '<tr style="background:#f5f7fa;">' +
+                    '<th style="padding:8px; text-align:left; border-bottom:1px solid #ddd;">ID</th>' +
+                    '<th style="padding:8px; text-align:left; border-bottom:1px solid #ddd;">姓名</th>' +
+                    '<th style="padding:8px; text-align:left; border-bottom:1px solid #ddd;">邮箱</th>' +
+                    '<th style="padding:8px; text-align:left; border-bottom:1px solid #ddd;">年龄</th>' +
+                    '</tr>';
+                parsed.data.forEach(u => {
+                    html += '<tr>' +
+                        '<td style="padding:8px; border-bottom:1px solid #eee;">' + u.id + '</td>' +
+                        '<td style="padding:8px; border-bottom:1px solid #eee;">' + u.name + '</td>' +
+                        '<td style="padding:8px; border-bottom:1px solid #eee;">' + u.email + '</td>' +
+                        '<td style="padding:8px; border-bottom:1px solid #eee;">' + u.age + '</td>' +
+                        '</tr>';
+                });
+                html += '</table>';
+            } else {
+                html = '<pre>' + formatJson(parsed) + '</pre>';
+            }
+            document.getElementById('userList').innerHTML = html;
+
+        } catch (e) {
+            setStatus('requestStatus', '解密失败: ' + e.message, 'fail');
+            document.getElementById('decryptedPre').textContent =
+                '解密错误: ' + e.message + '\n\n响应数据:\n' + formatJson(cryptoResponse);
+            document.getElementById('decryptLog').classList.add('show');
+        }
+    }
+</script>
+</body>
+</html>
