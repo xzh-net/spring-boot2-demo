@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.xzh</groupId>
-    <artifactId>rsa-aes</artifactId>
+    <artifactId>spring-boot-rsa</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>rsa-aes</name>
+    <name>spring-boot-rsa</name>
     <description>RSA + AES hybrid encryption demo</description>
 
     <parent>
