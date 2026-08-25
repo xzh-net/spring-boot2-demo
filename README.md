@@ -149,3 +149,5 @@
 - [海康互联开放平台视频取流](spring-boot-hikiot) — 对接海康互联 Hikiot Open API 实现在线监控视频流获取
 
 - [萤石开放平台视频取流](spring-boot-ys7) — 对接萤石 EZOPEN OPEN API 实现在线监控视频流播放
+
+- [高德地图逆地理编码](spring-boot-geo) — 通过经纬度坐标查询行政区划编码与详细地址信息
