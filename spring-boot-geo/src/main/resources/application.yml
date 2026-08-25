@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: spring-boot-geo
+
+## 高德地图配置
+amap:
+  key: ${AMAP_KEY:your-amap-key}
+  base-url: https://restapi.amap.com/v3
+
+logging:
+  level:
+    net.xzh.geo: debug
+  pattern:
+    dateformat: MM-dd HH:mm:ss:SSS
