@@ -1,13 +1,15 @@
 package net.xzh.geo.model;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class GeoCodeResponse {
     private String status;
     private String info;
     private String infocode;
-    private Regeocode regeocode;
+    private Regeocode regeocode;           // 单个请求返回
+    private List<Regeocode> regeocodes;    // 批量请求返回
 
     @Data
     public static class Regeocode {
@@ -26,5 +28,6 @@ public class GeoCodeResponse {
         private String building;
         private String adcode;
         private String citycode;
+        private String towncode;
     }
 }
