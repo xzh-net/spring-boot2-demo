@@ -30,12 +30,8 @@ public class GeoCodeController {
     }
 
     @GetMapping("/batch")
-    public Result<List<GeoCodeResponse.Regeocode>> batchRegeo(
-            @RequestParam String locations) {
-        String[] parts = locations.split(";");
-        String formatted = String.join("|", parts);
-
-        GeoCodeResponse response = geoCodeService.batchRegeo(formatted.toString());
+    public Result<List<GeoCodeResponse.Regeocode>> batchRegeo() {
+        GeoCodeResponse response = geoCodeService.batchRegeo();
         if (response != null && "1".equals(response.getStatus())
                 && response.getRegeocodes() != null) {
             return Result.success(response.getRegeocodes());

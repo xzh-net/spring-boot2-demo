@@ -4,17 +4,6 @@ server:
 spring:
   application:
     name: spring-boot-geo
-  datasource:
-    url: jdbc:mysql://192.168.31.161:3306/geo?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
 
 ## 高德地图配置
 amap:
