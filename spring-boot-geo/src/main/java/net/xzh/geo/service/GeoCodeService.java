@@ -136,7 +136,6 @@ public class GeoCodeService {
 
 		String response = callBatchWithRetry(params, batchNum);
 		if (response == null) {
-			log.error("批次 {} 批量失败，跳过坐标: {}", batchNum, batch);
 			return;
 		}
 
@@ -150,10 +149,10 @@ public class GeoCodeService {
 				}
 			}
 			results.addAll(valid);
-			log.info("批次 {} 成功，发送 {} 个坐标，有效 {} 条，过滤 {} 条",
+			log.info("批次 {} 成功，发送 {} 个坐标，有效 {} 条，过滤无效 {} 条",
 					batchNum, batch.size(), valid.size(), resp.getRegeocodes().size() - valid.size());
 		} else {
-			log.error("批次 {} 返回异常: {}，跳过坐标: {}", batchNum, resp != null ? resp.getInfo() : "null", batch);
+			log.warn("批次 {} 返回数据为空，跳过坐标: {}", batchNum, batch);
 		}
 	}
 
@@ -166,9 +165,12 @@ public class GeoCodeService {
 				String response = HttpUtil.get(url, params);
 				GeoCodeResponse resp = JSON.parseObject(response, GeoCodeResponse.class);
 
-				if (resp != null && "1".equals(resp.getStatus())
-						&& resp.getRegeocodes() != null && !resp.getRegeocodes().isEmpty()) {
-					return response;
+				if (resp != null && "1".equals(resp.getStatus())) {
+					if (resp.getRegeocodes() != null && !resp.getRegeocodes().isEmpty()) {
+						return response;
+					}
+					log.warn("{}调用成功返回空对象，跳过", prefix);
+					return null;
 				}
 
 				if (resp != null && isQuotaError(resp.getInfocode())) {
