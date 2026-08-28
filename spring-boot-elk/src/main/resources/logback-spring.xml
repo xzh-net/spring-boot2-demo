@@ -142,7 +142,7 @@
         <appender-ref ref="point_log_async" />
         <appender-ref ref="point_log_stash_async" />
     </logger>
-    <logger name="net.xzh.log.service.impl.LoggerAuditServiceImpl" level="debug" addtivity="false">
+    <logger name="net.xzh.log.service.impl.LoggerAuditServiceImpl" level="debug" additivity="false">
         <appender-ref ref="audit_log_async" />
     </logger>
     
