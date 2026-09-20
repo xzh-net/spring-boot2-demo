@@ -144,6 +144,10 @@
 
 - [Dify 大模型平台调用](spring-boot-dify) — 使用 Spring WebClient 调用 Dify API 接入大模型应用能力
 
+---
+
+## 6. 企业集成
+
 - [微信公众号与企业微信](spring-boot-wechat) — 微信公众号消息、菜单、授权及企业微信开发集成
 
 - [海康互联开放平台视频取流](spring-boot-hikiot) — 对接海康互联 Hikiot Open API 实现在线监控视频流获取
@@ -151,3 +155,5 @@
 - [萤石开放平台视频取流](spring-boot-ys7) — 对接萤石 EZOPEN OPEN API 实现在线监控视频流播放
 
 - [高德地图逆地理编码](spring-boot-geo) — 通过经纬度坐标查询行政区划编码与详细地址信息
+
+- [ctwing 物联网平台设备管理](spring-boot-ctwing) — 对接电信 ctwing (AEP) 物联网平台，实现设备创建、查询、删除、分组绑定与控制指令下发
