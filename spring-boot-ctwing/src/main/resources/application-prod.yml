@@ -1,0 +1,31 @@
+## prod 环境：平台认证 + 设备类型/协议 → 产品 映射配置
+aep:
+  ## 发送侧：REST API 调用（认证、产品映射、指令下发、设备管理）
+  send:
+    app-key: IQsPnFznnO7
+    app-secret: dbwgP7q7IM
+    operator: 29000171007
+    ttl: 60
+    products:
+      # 球阀 4G（MQTT）产品；设备类型枚举见 DeviceType
+      - type: BALL_VALVE
+        protocol: "4G"
+        product-id: 17080670
+        master-key: 8cfcd4c035324bbb965665fbca9f641e
+      # 球阀 NB（LWM2M）产品
+      - type: BALL_VALVE
+        protocol: "NB"
+        product-id: 17070058
+        master-key: eae81317759343c58a99f441f4bba615
+      # 后续接入其他设备类型时，在此按 (设备类型, 协议) 追加产品配置，例如：
+      # - type: BUTTERFLY_VALVE
+      #   protocol: "4G"
+      #   product-id:
+      #   master-key:
+  ## 接收侧：北向 MQ 消息推送（AEP 控制台「消息订阅推送 → 开通 MQ 服务」后给出值反填）
+  ## 与发送侧分离，为将来拆分发送/接收工程做准备
+  mq:
+    server: 2000455438.mq-msgpush.ctwing.cn:16651
+    tenant-id: 2000455438 
+    token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMDAwNDU1NDM4In0.djVwoNmZyQ5ArkDm-WM9Dvi9AbsypY_-5NUe4eF5PIE
+    topics: ["iflytek_test_datareport"]

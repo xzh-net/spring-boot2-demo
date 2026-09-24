@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>球阀调试 · 手机模拟器</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Microsoft YaHei", -apple-system, sans-serif; background: #eef1f5; color: #333; padding: 16px; }
+  .page { max-width: 980px; margin: 0 auto; display: flex; gap: 20px; flex-wrap: wrap; }
+
+  .btn { border: none; border-radius: 6px; padding: 7px 14px; font-size: 13px; cursor: pointer; color: #fff; }
+  .btn-clear { background: #8a93a0; }
+  .btn-copy { background: #2f8f73; }
+
+  /* ===== 手机壳 ===== */
+  .phone { width: 360px; background: #111; border-radius: 36px; padding: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.25); }
+  .phone-screen { background: #f5f6f8; border-radius: 26px; overflow: hidden; min-height: 640px; display: flex; flex-direction: column; }
+
+  .app-header { background: #2f8f73; color: #fff; padding: 12px 16px; font-size: 15px; font-weight: bold; display: flex; align-items: center; justify-content: center; position: relative; min-height: 44px; }
+  .app-header .back { font-weight: normal; opacity: .9; position: absolute; left: 12px; text-decoration: none; color: #fff; font-size: 18px; line-height: 1; padding: 4px 8px; }
+
+  .selector-card { background: #fff; margin: 6px 10px; border-radius: 10px; padding: 2px 12px; display: flex; flex-direction: column; }
+  .info-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .lab { font-size: 12px; color: #666; width: 72px; flex-shrink: 0; }
+  .info-row .val { flex: 1; min-width: 0; font-size: 12px; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: Consolas, "Microsoft YaHei", monospace; }
+  .info-row .val.mono { font-family: Consolas, monospace; }
+  .info-row .val.na { color: #999; }
+  .selector-actions { display: flex; gap: 8px; justify-content: flex-end; padding: 6px 0; border-top: 1px solid #f0f0f0; }
+
+  .badge { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 11px; }
+  .badge-on { background: #e6f6ef; color: #1b7a56; }
+  .badge-off { background: #f3f4f6; color: #6b7280; }
+
+  .valve-card { background: #fff; margin: 0 10px 10px; border-radius: 10px; padding: 2px 12px; }
+  .valve-row { padding: 6px 0; display: flex; align-items: center; justify-content: space-between; }
+  .valve-row + .valve-row { border-top: 1px solid #f0f0f0; }
+  .valve-label { border: 1px solid #2f8f73; color: #2f8f73; border-radius: 6px; padding: 6px 14px; font-size: 14px; background: #fff; }
+  .angle-select { border: 1.5px solid #2f8f73; color: #2f8f73; background: #fff; border-radius: 6px; padding: 7px 10px; font-size: 14px; min-width: 96px; outline: none; }
+  .valve-ctrl { display: flex; align-items: center; gap: 14px; }
+  .switch { position: relative; width: 44px; height: 24px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #ccc; border-radius: 24px; transition: .2s; cursor: pointer; }
+  .slider:before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  .switch input:checked + .slider { background: #2f8f73; }
+  .switch input:checked + .slider:before { transform: translateX(20px); }
+
+  .desc-box { margin: 0 10px 10px; font-size: 12px; color: #666; line-height: 1.6; background: #fff; border-radius: 8px; padding: 8px 10px; }
+  .desc-box:empty { display: none; }
+
+  /* ===== 日志面板 ===== */
+  .panel { flex: 1; min-width: 320px; background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.06); display: flex; flex-direction: column; }
+  .panel-hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .panel-hd h3 { font-size: 14px; color: #444; }
+  .panel-hd .log-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  #logBox { flex: 1; min-height: 420px; max-height: 640px; overflow: auto; background: #101418; color: #9fe8a8; font-family: Consolas, monospace; font-size: 12px; line-height: 1.55; padding: 10px; border-radius: 8px; white-space: pre-wrap; word-break: break-all; }
+  .log-time { color: #6a9955; }
+  .log-tag { color: #dcdcaa; font-weight: bold; }
+  .log-err { color: #ff7b72; }
+  .log-info { color: #9cdcfe; }
+  #logBox .log-note { color: #6a9955; }
+  .hint { font-size: 12px; color: #888; margin-top: 8px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 手机模拟器 -->
+  <div class="phone">
+    <div class="phone-screen">
+      <div class="app-header">
+        <a class="back" href="index.html" title="返回设备列表">&lt;</a>
+        <span id="hdrTitle">球阀调试</span>
+      </div>
+
+      <!-- 设备信息：与列表字段一致，只读（名称已在顶栏） -->
+      <div class="selector-card" id="infoCard">
+        <div class="info-row"><span class="lab">设备ID</span><span class="val mono" id="vDeviceId">-</span></div>
+        <div class="info-row"><span class="lab">设备编号</span><span class="val mono" id="vSn">-</span></div>
+        <div class="info-row"><span class="lab">类型</span><span class="val" id="vType">-</span></div>
+        <div class="info-row"><span class="lab">型号</span><span class="val" id="vModel">-</span></div>
+        <div class="info-row"><span class="lab">通信方式</span><span class="val" id="vProto">-</span></div>
+        <div class="info-row"><span class="lab">注册状态</span><span class="val" id="vReg">-</span></div>
+      </div>
+
+      <div id="valveRows"></div>
+
+      <div class="desc-box" id="descBox" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- 日志面板 -->
+  <div class="panel">
+    <div class="panel-hd">
+      <h3>调试日志（请求 / 响应 / 报文）</h3>
+      <div class="log-actions">
+        <button class="btn btn-copy" id="btnCopyLog" type="button">复制日志</button>
+        <button class="btn btn-clear" id="btnClearLog" type="button">清空日志</button>
+      </div>
+    </div>
+    <div id="logBox"></div>
+  </div>
+</div>
+
+<script>
+let CONFIG = null;
+let DEVICE = null; // 当前设备（只读展示）
+
+const $ = id => document.getElementById(id);
+const logBox = $("logBox");
+
+const TYPE_NAMES = {
+  BALL_VALVE: "球阀",
+  BUTTERFLY_VALVE: "蝶阀",
+  FERTIGATION_MACHINE: "水肥机",
+  WATER_PUMP: "水泵",
+  VIDEO_CAMERA: "摄像头",
+  WEATHER_STATION: "气象站",
+  SOIL_MONITOR: "土壤墒情监测仪",
+  PEST_MONITORING_LAMP: "虫情测报灯",
+  SPORE_COLLECTOR: "孢子捕捉仪"
+};
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function modelCfg(typeCode, modelCode) {
+  if (!CONFIG || !CONFIG.types || !typeCode || !modelCode) return {};
+  const t = CONFIG.types[typeCode];
+  return (t && t.models && t.models[modelCode]) || {};
+}
+
+function modelName(typeCode, modelCode) {
+  return modelCfg(typeCode, modelCode).name || modelCode || "-";
+}
+
+function setVal(id, text, na) {
+  const el = $(id);
+  el.textContent = text == null || text === "" ? "-" : text;
+  el.classList.toggle("na", !text);
+}
+
+function currentValve() {
+  if (!DEVICE || !CONFIG) return null;
+  const mp = modelCfg(DEVICE.type, DEVICE.model);
+  return {
+    sn: DEVICE.sn,
+    name: DEVICE.name,
+    type: DEVICE.model,
+    typeCode: DEVICE.type,
+    model: DEVICE.model,
+    proto: DEVICE.proto,
+    deviceId: DEVICE.deviceId || "",
+    mode: mp.mode || "single",
+    exclusive: !!mp.exclusive,
+    angles: mp.angles || [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+    valves: mp.valves || [{ label: "左阀", dir: 1 }],
+    desc: mp.desc || ""
+  };
+}
+
+function fillInfo() {
+  if (!DEVICE) {
+    $("hdrTitle").textContent = "球阀调试";
+    setVal("vSn", "-");
+    setVal("vType", "-");
+    setVal("vModel", "-");
+    setVal("vProto", "-");
+    $("vReg").innerHTML = "-";
+    setVal("vDeviceId", "-");
+    return;
+  }
+  $("hdrTitle").textContent = DEVICE.name || DEVICE.sn || "球阀调试";
+  setVal("vSn", DEVICE.sn);
+  setVal("vType", TYPE_NAMES[DEVICE.type] || DEVICE.type);
+  setVal("vModel", modelName(DEVICE.type, DEVICE.model));
+  setVal("vProto", DEVICE.proto);
+  const on = DEVICE.regStatus === 1;
+  $("vReg").innerHTML = `<span class="badge ${on ? "badge-on" : "badge-off"}">${on ? "已注册" : "未注册"}</span>`;
+  setVal("vDeviceId", DEVICE.deviceId);
+}
+
+function log(msg, cls, tag) {
+  if (tag && tag !== "请求" && tag !== "响应" && tag !== "报文") return;
+  const t = new Date().toTimeString().slice(0, 8);
+  const c = cls === "err" ? "log-err" : cls === "info" ? "log-info" : "";
+  const tagHtml = tag ? ` <span class="log-tag">[${tag}]</span>` : "";
+  const body = escapeHtml(msg).replace(/(\/\/[^\n]*)/g, '<span class="log-note">$1</span>');
+  logBox.innerHTML += `<div><span class="log-time">[${t}]</span>${tagHtml} <span class="${c}">${body}</span></div>`;
+  logBox.scrollTop = logBox.scrollHeight;
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+const FIELD_NOTES = {
+  "para_set": "讯飞球阀参数设置指令（设备协议固定结构）",
+  "id": "任务号 taskNo，设备 para_ack 原样回带，用于配对本次指令",
+  "data": "参数数据体",
+  "dir": "方向：0=关 1=A侧开 2=B侧开 3=AB全开",
+  "open": "目标开度",
+  "openlist": "多头阀各头开度列表，与阀体顺序一一对应",
+  "ctlmode": "控制模式，固定 0",
+  "idlehearttime": "空闲心跳间隔（秒）",
+  "work_reporttype": "工作上报类型，固定 0",
+  "work_reportinter": "工作上报间隔（秒），决定 meas 上报周期",
+  "value_actinter": "自动停机间隔，0=取消自动停",
+  "max_open_time": "最长开启时长，0=不限",
+  "batminvol": "电压相关字段（慧种田兼容写法，设备原样回显）"
+};
+
+function annotateJson(jsonStr) {
+  let obj;
+  try { obj = JSON.parse(jsonStr); } catch (e) { return jsonStr; }
+  const pad = n => "  ".repeat(n);
+  const lines = [];
+  function walk(val, key, depth, trailingComma) {
+    const note = key && FIELD_NOTES[key] ? `  // ${FIELD_NOTES[key]}` : "";
+    const keyPart = key !== undefined && key !== null ? `"${key}": ` : "";
+    const comma = trailingComma ? "," : "";
+    if (val !== null && typeof val === "object") {
+      const isArray = Array.isArray(val);
+      const entries = isArray ? val.map((v, i) => [i, v]) : Object.entries(val);
+      if (entries.length === 0) {
+        lines.push(`${pad(depth)}${keyPart}${isArray ? "[]" : "{}"}${comma}${note}`);
+        return;
+      }
+      lines.push(`${pad(depth)}${keyPart}${isArray ? "[" : "{"}${note}`);
+      entries.forEach(([k, v], i) => walk(v, isArray ? undefined : k, depth + 1, i < entries.length - 1));
+      lines.push(`${pad(depth)}${isArray ? "]" : "}"}${comma}`);
+    } else {
+      const v = typeof val === "string" ? JSON.stringify(val) : String(val);
+      lines.push(`${pad(depth)}${keyPart}${v}${comma}${note}`);
+    }
+  }
+  walk(obj, undefined, 0, false);
+  return lines.join("\n");
+}
+
+function formatPayload(d) {
+  return [annotateJson(d.json), `hex=${d.hex}`].join("\n");
+}
+
+function fillAngleOptions(sel, angles) {
+  sel.innerHTML = `<option value="" selected>请选择</option>` +
+    angles.map(a => `<option value="${a}">${a}%</option>`).join("");
+}
+
+function renderValveRows() {
+  const v = currentValve();
+  const box = $("valveRows");
+  box.innerHTML = "";
+  $("descBox").textContent = "";
+  $("descBox").style.display = "none";
+  if (!v) return;
+  if (v.desc) {
+    $("descBox").textContent = v.desc;
+    $("descBox").style.display = "block";
+  }
+  const card = document.createElement("div");
+  card.className = "valve-card";
+  box.appendChild(card);
+  v.valves.forEach((vd, idx) => {
+    const row = document.createElement("div");
+    row.className = "valve-row";
+    row.innerHTML = `
+      <button class="valve-label" type="button">${esc(vd.label)}</button>
+      <div class="valve-ctrl">
+        <select class="angle-select" id="angle_${idx}"></select>
+        <label class="switch"><input type="checkbox" id="sw_${idx}"><span class="slider"></span></label>
+      </div>`;
+    card.appendChild(row);
+    fillAngleOptions($(`angle_${idx}`), v.angles);
+    $(`sw_${idx}`).addEventListener("change", e => onToggle(idx, e.target.checked));
+    $(`angle_${idx}`).addEventListener("change", () => {
+      const val = $(`angle_${idx}`).value;
+      if ($(`sw_${idx}`).checked && val !== "") sendOpen(v, idx);
+    });
+  });
+}
+
+async function onToggle(idx, on) {
+  const v = currentValve();
+  if (!v) return;
+  if (on) {
+    if ($(`angle_${idx}`).value === "") {
+      log("请先选择开度", "err", "操作");
+      $(`sw_${idx}`).checked = false;
+      return;
+    }
+    if (v.exclusive) {
+      for (let i = 0; i < v.valves.length; i++) {
+        if (i !== idx && $(`sw_${i}`) && $(`sw_${i}`).checked) {
+          $(`sw_${i}`).checked = false;
+          $(`angle_${i}`).value = "";
+        }
+      }
+    }
+    await sendOpen(v, idx);
+  } else {
+    await sendClose(v, idx);
+  }
+}
+
+function buildBase(v) {
+  // deviceId 为空时由后端按 productId+sn 拼接（4G）；NB 必须库内已有 deviceId
+  return {
+    deviceType: v.typeCode || "BALL_VALVE",
+    protocolType: v.proto,
+    deviceId: v.deviceId || "",
+    sn: v.sn
+  };
+}
+
+async function sendOpen(v, idx) {
+  const open = parseInt($(`angle_${idx}`).value, 10);
+  if (v.mode === "multi") {
+    const openlist = v.valves.map((_, i) =>
+      i === idx ? open : ($(`angle_${i}`).value === "" ? 0 : parseInt($(`angle_${i}`).value, 10)));
+    const dir = openlist.some(x => x > 0) ? 3 : 0;
+    return callApi("/api/aep/command/iflytek/valve",
+      Object.assign(buildBase(v), { openlist, dir }),
+      `多头 openlist=[${openlist}] dir=${dir}`);
+  }
+  const dir = v.valves[idx].dir;
+  return callApi("/api/aep/command/iflytek/valve",
+    Object.assign(buildBase(v), { dir, open }),
+    `开 ${v.valves[idx].label} dir=${dir} open=${open}`);
+}
+
+async function sendClose(v, idx) {
+  if (v.mode === "multi") {
+    const openlist = v.valves.map((_, i) =>
+      i === idx ? 0 : ($(`angle_${i}`).value === "" || !$(`sw_${i}`).checked
+        ? 0 : parseInt($(`angle_${i}`).value, 10)));
+    const dir = openlist.some(x => x > 0) ? 3 : 0;
+    return callApi("/api/aep/command/iflytek/valve",
+      Object.assign(buildBase(v), { openlist, dir }),
+      `关 ${v.valves[idx].label} openlist=[${openlist}] dir=${dir}`);
+  }
+  return callApi("/api/aep/command/iflytek/valve",
+    Object.assign(buildBase(v), { dir: 0, open: 0 }),
+    `关 ${v.valves[idx].label} dir=0 open=0`);
+}
+
+async function callApi(path, body, label) {
+  log(`${label} POST ${path}\n${JSON.stringify(body, null, 2)}`, "info", "请求");
+  try {
+    const resp = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const json = await resp.json();
+    const d = json.data || {};
+    const brief = d.commandId
+      ? `code=${json.code} message=${json.message} commandId=${d.commandId}`
+      : `code=${json.code} message=${json.message}\n${JSON.stringify(d, null, 2)}`;
+    log(brief, json.code === 200 ? "" : "err", "响应");
+    if (json.code === 200 && d.hex) {
+      log(formatPayload(d), "info", "报文");
+    }
+    return json;
+  } catch (e) {
+    log(`${label} 异常: ${e.message}`, "err", "响应");
+    return null;
+  }
+}
+
+$("btnClearLog").addEventListener("click", () => { logBox.innerHTML = ""; });
+$("btnCopyLog").addEventListener("click", async () => {
+  const text = logBox.innerText;
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    const btn = $("btnCopyLog");
+    const old = btn.textContent;
+    btn.textContent = "已复制";
+    setTimeout(() => { btn.textContent = old; }, 1500);
+  } catch (e) {
+    const range = document.createRange();
+    range.selectNodeContents(logBox);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    try { document.execCommand("copy"); } catch (ignore) {}
+    sel.removeAllRanges();
+  }
+});
+
+function getIdFromUrl() {
+  const params = new URLSearchParams(location.search);
+  const id = (params.get("id") || "").trim();
+  return id ? Number(id) : null;
+}
+
+async function fetchDeviceById(id) {
+  const resp = await fetch("api/device/" + encodeURIComponent(id));
+  const json = await resp.json();
+  if (!json || json.code !== 200) {
+    throw new Error((json && json.message) || "查询设备失败");
+  }
+  return json.data || null;
+}
+
+async function init() {
+  const id = getIdFromUrl();
+  if (!id) {
+    log("缺少设备 id 参数，请从设备列表点击「调试」进入", "err", "系统");
+    fillInfo();
+    return;
+  }
+  try {
+    const [cfgResp, device] = await Promise.all([
+      fetch("valve-config.json"),
+      fetchDeviceById(id)
+    ]);
+    CONFIG = await cfgResp.json();
+    if (!device) {
+      log("未找到设备: " + id, "err", "系统");
+      fillInfo();
+      return;
+    }
+    DEVICE = device;
+    fillInfo();
+    renderValveRows();
+    log("已加载设备 " + (DEVICE.sn || id), "info", "系统");
+  } catch (e) {
+    log("加载失败: " + e.message, "err", "系统");
+    fillInfo();
+  }
+}
+
+init();
+</script>
+</body>
+</html>

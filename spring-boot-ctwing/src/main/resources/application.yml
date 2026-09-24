@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: spring-boot-ctwing
+  profiles:
+    active: prod
+  datasource:
+    url: jdbc:sqlite:/ctwing.db
+    driver-class-name: org.sqlite.JDBC
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+logging:
+  level:
+    net.xzh.ctwing: debug
+    # 屏蔽 Pulsar 消费统计刷屏
+    org.apache.pulsar.client.impl.ConsumerStatsRecorderImpl: warn
+    org.apache.pulsar: warn
+  pattern:
+    dateformat: MM-dd HH:mm:ss:SSS

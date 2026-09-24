@@ -1,0 +1,24 @@
+## dev 环境：平台认证 + 设备类型/协议 → 产品 映射配置（演示项目，值为占位 123456）
+aep:
+  ## 发送侧：REST API 调用（认证、产品映射、指令下发、设备管理）
+  send:
+    app-key: 123456
+    app-secret: 123456
+    operator: 123456
+    ttl: 60
+    products:
+      - type: BALL_VALVE
+        protocol: "4G"
+        product-id: 123456
+        master-key: 123456
+      - type: BALL_VALVE
+        protocol: "NB"
+        product-id: 123456
+        master-key: 123456
+  ## 接收侧：北向 MQ 消息推送（AEP 控制台「消息订阅推送 → 开通 MQ 服务」后给出值反填）
+  ## 与发送侧分离，为将来拆分发送/接收工程做准备
+  mq:
+    server:
+    tenant-id:
+    token:
+    topics: []

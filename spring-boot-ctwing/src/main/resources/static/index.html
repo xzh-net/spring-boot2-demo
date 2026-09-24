@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设备列表</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Microsoft YaHei", -apple-system, sans-serif; background: #eef1f5; color: #333; padding: 20px; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+  .top h1 { font-size: 18px; color: #222; }
+
+  .tabs { display: flex; gap: 0; margin-bottom: 12px; border-bottom: 2px solid #d9dee5; }
+  .tab { border: none; background: transparent; padding: 9px 18px; font-size: 14px; cursor: pointer; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab.active { color: #2f8f73; font-weight: 600; border-bottom-color: #2f8f73; }
+
+  .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .toolbar input, .toolbar select { border: 1px solid #ccc; border-radius: 6px; padding: 7px 10px; font-size: 13px; outline: none; background: #fff; }
+  .toolbar input { min-width: 180px; }
+  .toolbar select { min-width: 110px; }
+  .toolbar input:focus, .toolbar select:focus { border-color: #2f8f73; }
+  .toolbar .lab { font-size: 13px; color: #555; white-space: nowrap; }
+
+  .btn { border: none; border-radius: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; color: #fff; white-space: nowrap; }
+  .btn-primary { background: #2f8f73; }
+  .btn-ghost { background: #fff; color: #2f8f73; border: 1px solid #2f8f73; }
+  .btn-warn { background: #d97706; }
+  .btn-danger { background: #dc2626; }
+  .btn-muted { background: #8a93a0; }
+  .btn-sm { padding: 4px 7px; font-size: 12px; margin: 0 2px; }
+
+  .card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+  th, td { padding: 11px 10px; text-align: center; border-bottom: 1px solid #f0f0f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+  th { background: #fafbfc; color: #666; font-weight: 600; text-align: center; }
+  tr:hover td { background: #f8fbfa; }
+  .empty { text-align: center; color: #888; padding: 28px 0; font-size: 13px; }
+
+  th.op, td.op { text-align: center; }
+  th.op { width: 220px; }
+  #tbody td.op { text-align: left; }
+  td.op .btn-sm { margin: 1px 1px; }
+
+  .badge { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 12px; }
+  .badge-on { background: #e6f6ef; color: #1b7a56; }
+  .badge-off { background: #f3f4f6; color: #6b7280; }
+  .badge-blue { background: #e8f0fe; color: #1d4ed8; }
+  .proto { font-weight: 600; }
+  .proto-4g { color: #2f6fed; }
+  .proto-nb { color: #b45309; }
+  .mono { font-family: Consolas, monospace; }
+  .id-cell { min-width: 0; line-height: 1.4; }
+  .id-cell .id-txt { display: inline-block; vertical-align: middle; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: Consolas, monospace; text-align: left; direction: rtl; line-height: 1.4; }
+  .btn-copy { display: inline-block; vertical-align: middle; border: 1px solid #2f8f73; background: #fff; color: #2f8f73; border-radius: 6px; padding: 3px 7px; font-size: 12px; cursor: pointer; line-height: 1.3; white-space: nowrap; }
+  .btn-copy:hover { background: #2f8f73; color: #fff; }
+
+  /* 分页：与页面正文同色字号 */
+  .pager { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 12px; font-size: 13px; color: #666; background: #fff; border-top: 1px solid #f0f0f0; }
+  .pager .info { color: #666; font-size: 13px; }
+  .pager button { border: 1px solid #d0d5dd; background: #fff; color: #444; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+  .pager button:hover:not(:disabled) { border-color: #2f8f73; color: #2f8f73; }
+  .pager button:disabled { opacity: .45; cursor: not-allowed; }
+  .pager .page-no { min-width: 56px; text-align: center; color: #444; font-size: 13px; }
+
+  .mask { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none; align-items: center; justify-content: center; z-index: 20; }
+  .mask.show { display: flex; }
+  .modal { background: #fff; border-radius: 10px; width: 440px; max-width: 92vw; padding: 18px; max-height: 90vh; overflow: auto; }
+  .modal h3 { font-size: 15px; margin-bottom: 14px; }
+  .form-row { display: flex; align-items: center; margin-bottom: 10px; gap: 8px; }
+  .form-row label { width: 88px; flex-shrink: 0; font-size: 13px; color: #555; }
+  .form-row input, .form-row select { flex: 1; min-width: 0; border: 1px solid #ccc; border-radius: 6px; padding: 7px 8px; font-size: 13px; outline: none; background: #fff; }
+  .form-row input:focus, .form-row select:focus { border-color: #2f8f73; }
+  .form-row .val { flex: 1; font-size: 13px; word-break: break-all; color: #333; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+
+  #msg { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: #222; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 13px; display: none; z-index: 30; max-width: 90vw; }
+  #msg.err { background: #dc2626; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>设备列表</h1>
+  </div>
+
+  <div class="tabs">
+    <button type="button" class="tab active" data-tab="local">本地设备</button>
+    <button type="button" class="tab" data-tab="platform">平台设备</button>
+  </div>
+
+  <!-- 本地设备 -->
+  <div id="panel-local">
+    <div class="toolbar">
+      <input id="kw" placeholder="设备编号 / 名称 / 设备ID" />
+      <select id="fSearchType"><option value="">设备类型</option></select>
+      <select id="fSearchModel"><option value="">设备型号</option></select>
+      <select id="fSearchProto">
+        <option value="">通信方式</option>
+        <option value="4G">4G</option>
+        <option value="NB">NB</option>
+      </select>
+      <select id="fSearchReg">
+        <option value="">注册状态</option>
+        <option value="1">已注册</option>
+        <option value="0">未注册</option>
+      </select>
+      <button class="btn btn-primary" id="btnSearch" type="button">查询</button>
+      <button class="btn btn-muted" id="btnReset" type="button">重置</button>
+      <button class="btn btn-primary" id="btnAdd" type="button">新增设备</button>
+    </div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:16%">设备编号</th>
+            <th style="width:13%">设备名称</th>
+            <th style="width:9%">类型</th>
+            <th style="width:9%">型号</th>
+            <th style="width:9%">通信方式</th>
+            <th style="width:9%">注册状态</th>
+            <th style="width:18%">设备ID</th>
+            <th class="op">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty" id="empty" style="display:none">暂无设备</div>
+      <div class="pager" id="lpager" style="display:none">
+        <span class="info" id="linfo"></span>
+        <button type="button" id="lprev">上一页</button>
+        <span class="page-no" id="lpage"></span>
+        <button type="button" id="lnext">下一页</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 平台设备：默认空，输入条件后点查询 -->
+  <div id="panel-platform" style="display:none">
+    <div class="toolbar">
+      <span class="lab">设备类型</span>
+      <select id="pType" title="设备类型"></select>
+      <span class="lab">通信方式</span>
+      <select id="pProto" title="通信方式">
+        <option value="4G">4G</option>
+        <option value="NB">NB</option>
+      </select>
+      <span class="lab">关键字</span>
+      <input id="pKw" title="设备名称 / 编号 / ID / IMEI（必填）" placeholder="设备名称 / 编号 / ID / IMEI（必填）" />
+      <button class="btn btn-primary" id="btnPSearch" type="button">查询</button>
+      <button class="btn btn-muted" id="btnPReset" type="button">重置</button>
+    </div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28%">设备ID</th>
+            <th style="width:16%">设备名称</th>
+            <th style="width:20%">设备编号 / IMEI</th>
+            <th style="width:12%">激活状态</th>
+            <th style="width:12%">在线状态</th>
+            <th class="op" style="width:80px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="ptbody"></tbody>
+      </table>
+      <div class="empty" id="pempty">输入查询条件后点击「查询」</div>
+      <div class="empty" id="pnone" style="display:none">未找到平台设备</div>
+      <div class="pager" id="ppager" style="display:none">
+        <span class="info" id="pinfo"></span>
+        <button type="button" id="pprev">上一页</button>
+        <span class="page-no" id="ppage"></span>
+        <button type="button" id="pnext">下一页</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 本地 新增/修改 -->
+<div class="mask" id="editMask">
+  <div class="modal">
+    <h3 id="editTitle">新增设备</h3>
+    <div class="form-row">
+      <label>设备编号</label>
+      <input id="fSn" placeholder="SN，必填且唯一" />
+    </div>
+    <div class="form-row">
+      <label>设备名称</label>
+      <input id="fName" placeholder="设备名称" />
+    </div>
+    <div class="form-row">
+      <label>类型</label>
+      <select id="fType"></select>
+    </div>
+    <div class="form-row">
+      <label>型号</label>
+      <select id="fModel"></select>
+    </div>
+    <div class="form-row">
+      <label>通信方式</label>
+      <select id="fProto">
+        <option value="4G">4G</option>
+        <option value="NB">NB</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-muted" id="btnCancel" type="button">取消</button>
+      <button class="btn btn-primary" id="btnSave" type="button">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 平台 设备详情 -->
+<div class="mask" id="detailMask">
+  <div class="modal">
+    <h3>平台设备详情</h3>
+    <div id="detailBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-muted" id="btnDetailClose" type="button">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div id="msg"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const PAGE_SIZE = 10;
+
+const DEVICE_TYPES = [
+  { code: "BALL_VALVE", name: "球阀" },
+  { code: "BUTTERFLY_VALVE", name: "蝶阀" },
+  { code: "FERTIGATION_MACHINE", name: "水肥机" },
+  { code: "WATER_PUMP", name: "水泵" },
+  { code: "VIDEO_CAMERA", name: "摄像头" },
+  { code: "WEATHER_STATION", name: "气象站" },
+  { code: "SOIL_MONITOR", name: "土壤墒情监测仪" },
+  { code: "PEST_MONITORING_LAMP", name: "虫情测报灯" },
+  { code: "SPORE_COLLECTOR", name: "孢子捕捉仪" }
+];
+const DEVICE_MODELS = [
+  { code: "L_VALVE", name: "L型阀门" },
+  { code: "D_DUAL_HEAD", name: "D型双头" },
+  { code: "D_INTEGRATED", name: "D型一体" },
+  { code: "T_VALVE", name: "T型阀门" },
+  { code: "DUAL_HEAD", name: "双头" },
+  { code: "TRIPLE_HEAD", name: "三头" },
+  { code: "QUAD_HEAD", name: "四头" },
+  { code: "PENTA_SINGLE", name: "五通单" },
+  { code: "PENTA_DUAL", name: "五通双" }
+];
+const DEV_STATUS = { 0: "已注册", 1: "已激活", 2: "已注销" };
+const NET_STATUS = { 1: "在线", 2: "不在线" };
+
+let allLocal = [];
+let filteredLocal = [];
+let localPage = 1;
+let editingId = null;
+let localLoaded = false;
+
+let platformRows = [];
+let platformTotal = 0;
+let platformPage = 1;
+let platformSearched = false;
+
+function typeName(code) {
+  const hit = DEVICE_TYPES.find(x => x.code === code);
+  return hit ? hit.name : (code || "-");
+}
+function modelName(code) {
+  const hit = DEVICE_MODELS.find(x => x.code === code);
+  return hit ? hit.name : (code || "-");
+}
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+function showMsg(text, isErr) {
+  const el = $("msg");
+  el.textContent = text;
+  el.className = isErr ? "err" : "";
+  el.style.display = "block";
+  clearTimeout(showMsg._t);
+  showMsg._t = setTimeout(() => { el.style.display = "none"; }, 3000);
+}
+function fmtTime(ts) {
+  if (!ts) return "-";
+  try { return new Date(Number(ts)).toLocaleString(); } catch (e) { return String(ts); }
+}
+function pageSlice(list, page) {
+  const total = list.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const p = Math.min(Math.max(1, page), pages);
+  const start = (p - 1) * PAGE_SIZE;
+  return { page: p, pages, total, slice: list.slice(start, start + PAGE_SIZE) };
+}
+function updatePager(prefix, page, pages, total, onPrev, onNext) {
+  const box = $(prefix + "pager");
+  if (total <= 0) { box.style.display = "none"; return; }
+  box.style.display = "flex";
+  $(prefix + "info").textContent = "共 " + total + " 条";
+  $(prefix + "page").textContent = page + " / " + pages;
+  const prev = $(prefix + "prev");
+  const next = $(prefix + "next");
+  prev.disabled = page <= 1;
+  next.disabled = page >= pages;
+  prev.onclick = onPrev;
+  next.onclick = onNext;
+}
+
+async function api(path, method, body) {
+  const opt = { method: method || "GET", headers: { "Content-Type": "application/json" } };
+  if (body !== undefined) opt.body = JSON.stringify(body);
+  const resp = await fetch(path, opt);
+  const json = await resp.json();
+  if (json.code !== 200) throw new Error(json.message || "操作失败");
+  return json.data;
+}
+
+// ===== 选项卡 =====
+function switchTab(name) {
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.tab === name);
+  });
+  $("panel-local").style.display = name === "local" ? "" : "none";
+  $("panel-platform").style.display = name === "platform" ? "" : "none";
+  if (name === "local" && !localLoaded) {
+    loadList().catch(e => showMsg(e.message, true));
+  }
+}
+
+// ===== 本地设备（全量加载 + 前端筛选/分页 10/页）=====
+async function loadList() {
+  allLocal = await api("/api/device", "GET") || [];
+  localLoaded = true;
+  applyLocalFilter();
+}
+
+function applyLocalFilter() {
+  const kw = $("kw").value.trim().toLowerCase();
+  const type = $("fSearchType").value;
+  const model = $("fSearchModel").value;
+  const proto = $("fSearchProto").value;
+  const reg = $("fSearchReg").value;
+  filteredLocal = allLocal.filter(d => {
+    if (type && d.type !== type) return false;
+    if (model && d.model !== model) return false;
+    if (proto && d.proto !== proto) return false;
+    if (reg !== "" && String(d.regStatus == null ? 0 : d.regStatus) !== reg) return false;
+    if (kw) {
+      const hay = [d.sn, d.name, d.deviceId].map(x => String(x == null ? "" : x).toLowerCase());
+      if (!hay.some(x => x.includes(kw))) return false;
+    }
+    return true;
+  });
+  if (!filteredLocal.length) localPage = 1;
+  renderLocal();
+}
+
+function renderLocal() {
+  const tbody = $("tbody");
+  if (!filteredLocal.length) {
+    tbody.innerHTML = "";
+    $("empty").style.display = "block";
+    $("lpager").style.display = "none";
+    return;
+  }
+  $("empty").style.display = "none";
+  const { page, pages, total, slice } = pageSlice(filteredLocal, localPage);
+  localPage = page;
+  tbody.innerHTML = slice.map(d => {
+    const on = d.regStatus === 1;
+    const protoCls = d.proto === "NB" ? "proto-nb" : "proto-4g";
+    return `<tr>
+      <td class="mono" title="${esc(d.sn)}">${esc(d.sn)}</td>
+      <td title="${esc(d.name || "")}">${esc(d.name || "-")}</td>
+      <td>${esc(typeName(d.type))}</td>
+      <td>${esc(modelName(d.model))}</td>
+      <td class="proto ${protoCls}">${esc(d.proto)}</td>
+      <td><span class="badge ${on ? "badge-on" : "badge-off"}">${on ? "已注册" : "未注册"}</span></td>
+      <td class="id-cell" title="${esc(d.deviceId || "")}">
+        ${d.deviceId
+          ? `<span class="id-txt mono">${esc(d.deviceId)}</span><button type="button" class="btn-copy" data-copy="${esc(d.deviceId)}" title="复制设备ID">复制</button>`
+          : `-`}
+      </td>
+      <td class="op">
+        <button class="btn btn-sm btn-ghost" data-act="debug" data-id="${d.id}">调试</button>
+        <button class="btn btn-sm btn-ghost" data-act="edit" data-id="${d.id}">修改</button>
+        <button class="btn btn-sm btn-danger" data-act="del" data-id="${d.id}">删除</button>
+        ${on
+          ? `<button class="btn btn-sm btn-warn" data-act="unreg" data-id="${d.id}">取消注册</button>`
+          : `<button class="btn btn-sm btn-primary" data-act="reg" data-id="${d.id}">注册</button>`}
+      </td>
+    </tr>`;
+  }).join("");
+  updatePager("l", page, pages, total,
+    () => { localPage = page - 1; renderLocal(); },
+    () => { localPage = page + 1; renderLocal(); });
+}
+
+// ===== 平台设备（服务端分页 10/页）=====
+async function searchPlatform(page) {
+  const kw = $("pKw").value.trim();
+  if (!kw) {
+    showMsg("请输入查询条件", true);
+    $("pKw").focus();
+    return;
+  }
+  const deviceType = $("pType").value;
+  const protocolType = $("pProto").value;
+  platformPage = page || 1;
+  const q = new URLSearchParams({
+    deviceType, protocolType, searchValue: kw,
+    pageNow: String(platformPage), pageSize: String(PAGE_SIZE)
+  });
+  try {
+    $("btnPSearch").disabled = true;
+    showMsg("查询中…");
+    const data = await api("/api/aep/device?" + q.toString(), "GET");
+    platformRows = (data && data.list) || [];
+    platformTotal = (data && data.total != null) ? Number(data.total) : platformRows.length;
+    platformSearched = true;
+    renderPlatform();
+    showMsg(platformRows.length ? "查询完成" : "未找到匹配设备");
+  } catch (e) {
+    showMsg(e.message, true);
+  } finally {
+    $("btnPSearch").disabled = false;
+  }
+}
+
+function renderPlatform() {
+  const tbody = $("ptbody");
+  $("pempty").style.display = "none";
+  if (!platformSearched) {
+    tbody.innerHTML = "";
+    $("pempty").style.display = "block";
+    $("pnone").style.display = "none";
+    $("ppager").style.display = "none";
+    return;
+  }
+  if (!platformRows.length) {
+    tbody.innerHTML = "";
+    $("pnone").style.display = "block";
+    $("ppager").style.display = "none";
+    return;
+  }
+  $("pnone").style.display = "none";
+  tbody.innerHTML = platformRows.map((d, i) => {
+    const st = DEV_STATUS[d.deviceStatus] != null ? DEV_STATUS[d.deviceStatus] : (d.deviceStatus != null ? d.deviceStatus : "-");
+    const net = NET_STATUS[d.netStatus] != null ? NET_STATUS[d.netStatus] : (d.netStatus != null ? d.netStatus : "-");
+    const sn = d.deviceSn || d.imei || "-";
+    return `<tr>
+      <td class="id-cell" title="${esc(d.deviceId || "")}">
+        ${d.deviceId
+          ? `<span class="id-txt mono">${esc(d.deviceId)}</span><button type="button" class="btn-copy" data-copy="${esc(d.deviceId)}" title="复制设备ID">复制</button>`
+          : `-`}
+      </td>
+      <td title="${esc(d.deviceName || "")}">${esc(d.deviceName || "-")}</td>
+      <td class="mono" title="${esc(sn)}">${esc(sn)}</td>
+      <td><span class="badge ${d.deviceStatus === 1 ? "badge-on" : d.deviceStatus === 2 ? "badge-off" : "badge-blue"}">${esc(st)}</span></td>
+      <td><span class="badge ${d.netStatus === 1 ? "badge-on" : "badge-off"}">${esc(net)}</span></td>
+      <td class="op"><button class="btn btn-sm btn-ghost" data-pact="detail" data-pidx="${i}">详情</button></td>
+    </tr>`;
+  }).join("");
+  const pages = Math.max(1, Math.ceil(platformTotal / PAGE_SIZE));
+  updatePager("p", platformPage, pages, platformTotal,
+    () => searchPlatform(platformPage - 1),
+    () => searchPlatform(platformPage + 1));
+}
+
+async function openPlatformDetail(idx) {
+  const d = platformRows[idx];
+  if (!d || !d.deviceId) {
+    showMsg("缺少设备ID，无法查看详情", true);
+    return;
+  }
+  try {
+    const q = new URLSearchParams({
+      deviceType: $("pType").value,
+      protocolType: $("pProto").value
+    });
+    const info = await api(`/api/aep/device/${encodeURIComponent(d.deviceId)}?${q}`, "GET");
+    const st = DEV_STATUS[info.deviceStatus] != null ? DEV_STATUS[info.deviceStatus] : "-";
+    const net = NET_STATUS[info.netStatus] != null ? NET_STATUS[info.netStatus] : "-";
+    const rowsHtml = [
+      ["设备ID", info.deviceId],
+      ["设备名称", info.deviceName],
+      ["设备编号", info.deviceSn],
+      ["IMEI", info.imei],
+      ["产品ID", info.productId],
+      ["激活状态", st],
+      ["在线状态", net],
+      ["固件版本", info.firmwareVersion],
+      ["创建时间", fmtTime(info.createTime)],
+      ["激活时间", fmtTime(info.activeTime)],
+      ["最后上线", fmtTime(info.onlineAt)],
+      ["最后下线", fmtTime(info.offlineAt)]
+    ].map(([k, v]) => `<div class="form-row"><label>${k}</label><span class="val">${esc(v == null || v === "" ? "-" : v)}</span></div>`).join("");
+    $("detailBody").innerHTML = rowsHtml;
+    $("detailMask").classList.add("show");
+  } catch (e) {
+    showMsg(e.message, true);
+  }
+}
+
+function fillSelect(sel, list) {
+  sel.innerHTML = list.map(x => `<option value="${x.code}">${x.name}</option>`).join("");
+}
+
+function openEdit(device) {
+  editingId = device ? device.id : null;
+  $("editTitle").textContent = device ? "修改设备" : "新增设备";
+  $("fSn").value = device ? device.sn : "";
+  $("fName").value = device ? (device.name || "") : "";
+  $("fType").value = device ? device.type : "BALL_VALVE";
+  $("fModel").value = device ? device.model : "L_VALVE";
+  $("fProto").value = device ? device.proto : "4G";
+  $("fSn").disabled = !!device;
+  $("editMask").classList.add("show");
+}
+
+async function save() {
+  const body = {
+    sn: $("fSn").value.trim(),
+    name: $("fName").value.trim(),
+    type: $("fType").value,
+    model: $("fModel").value,
+    proto: $("fProto").value
+  };
+  try {
+    if (editingId == null) {
+      await api("/api/device", "POST", body);
+      showMsg("已新增");
+    } else {
+      await api("/api/device/" + editingId, "PUT", body);
+      showMsg("已保存");
+    }
+    $("editMask").classList.remove("show");
+    localPage = 1;
+    await loadList();
+  } catch (e) {
+    showMsg(e.message, true);
+  }
+}
+
+function sliceIndex(d) {
+  return filteredLocal.indexOf(d);
+}
+function pageRowId(id) {
+  return allLocal.find(x => String(x.id) === String(id));
+}
+
+async function onRowAction(btn) {
+  const id = btn.dataset.id;
+  const act = btn.dataset.act;
+  btn.disabled = true;
+  try {
+    if (act === "debug") {
+      const d = pageRowId(id);
+      if (!d || !d.id) {
+        showMsg("设备缺失", true);
+        return;
+      }
+      location.href = "debug.html?id=" + encodeURIComponent(d.id);
+      return;
+    }
+    if (act === "edit") {
+      openEdit(pageRowId(id));
+      return;
+    }
+    if (act === "del") {
+      const d = pageRowId(id);
+      const registered = d && (d.regStatus === 1 || (d.deviceId && String(d.deviceId).trim()));
+      if (registered) {
+        showMsg("设备已注册，请先取消注册后再删除", true);
+        return;
+      }
+      if (!confirm("确认删除该设备？（仅删本地库）")) return;
+      await api("/api/device/" + id, "DELETE");
+      showMsg("已删除");
+    } else if (act === "reg") {
+      showMsg("注册中…");
+      await api("/api/device/" + id + "/register", "POST");
+      showMsg("注册成功");
+    } else if (act === "unreg") {
+      if (!confirm("确认取消注册？")) return;
+      await api("/api/device/" + id + "/unregister", "POST");
+      showMsg("已取消注册");
+    }
+    await loadList();
+  } catch (e) {
+    showMsg(e.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.querySelectorAll(".tab").forEach(t => {
+  t.addEventListener("click", () => switchTab(t.dataset.tab));
+});
+$("kw").addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    localPage = 1;
+    applyLocalFilter();
+  }
+});
+$("btnSearch").addEventListener("click", () => {
+  localPage = 1;
+  applyLocalFilter();
+});
+$("btnReset").addEventListener("click", () => {
+  $("kw").value = "";
+  $("fSearchType").value = "";
+  $("fSearchModel").value = "";
+  $("fSearchProto").value = "";
+  $("fSearchReg").value = "";
+  localPage = 1;
+  applyLocalFilter();
+});
+$("btnAdd").addEventListener("click", () => openEdit(null));
+$("btnCancel").addEventListener("click", () => $("editMask").classList.remove("show"));
+$("btnSave").addEventListener("click", save);
+$("btnDetailClose").addEventListener("click", () => $("detailMask").classList.remove("show"));
+$("btnPSearch").addEventListener("click", () => searchPlatform(1));
+$("btnPReset").addEventListener("click", () => {
+  $("pType").value = "BALL_VALVE";
+  $("pProto").value = "4G";
+  $("pKw").value = "";
+  platformRows = [];
+  platformTotal = 0;
+  platformPage = 1;
+  platformSearched = false;
+  renderPlatform();
+});
+$("pKw").addEventListener("keydown", e => { if (e.key === "Enter") searchPlatform(1); });
+$("tbody").addEventListener("click", e => {
+  const copyBtn = e.target.closest("button[data-copy]");
+  if (copyBtn) {
+    copyText(copyBtn.dataset.copy, copyBtn);
+    return;
+  }
+  const btn = e.target.closest("button[data-act]");
+  if (btn) onRowAction(btn);
+});
+$("ptbody").addEventListener("click", e => {
+  const copyBtn = e.target.closest("button[data-copy]");
+  if (copyBtn) {
+    copyText(copyBtn.dataset.copy, copyBtn);
+    return;
+  }
+  const btn = e.target.closest("button[data-pact]");
+  if (btn && btn.dataset.pact === "detail") openPlatformDetail(Number(btn.dataset.pidx));
+});
+
+async function copyText(text, btn) {
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    const old = btn.textContent;
+    btn.textContent = "已复制";
+    setTimeout(() => { btn.textContent = old; }, 1200);
+  } catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); btn.textContent = "已复制"; setTimeout(() => { btn.textContent = "复制"; }, 1200); } catch (ignore) {}
+    document.body.removeChild(ta);
+  }
+}
+
+fillSelect($("fType"), DEVICE_TYPES);
+fillSelect($("fModel"), DEVICE_MODELS);
+fillSelect($("pType"), DEVICE_TYPES);
+fillSelect($("fSearchType"), DEVICE_TYPES);
+fillSelect($("fSearchModel"), DEVICE_MODELS);
+$("fSearchType").insertAdjacentHTML("afterbegin", '<option value="">设备类型</option>');
+$("fSearchModel").insertAdjacentHTML("afterbegin", '<option value="">设备型号</option>');
+$("fSearchType").value = "";
+$("fSearchModel").value = "";
+$("pType").value = "BALL_VALVE";
+loadList().catch(e => showMsg(e.message, true));
+</script>
+</body>
+</html>

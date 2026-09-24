@@ -1,0 +1,110 @@
+{
+  "types": {
+    "BALL_VALVE": {
+      "models": {
+        "L_VALVE": {
+          "name": "L型阀门",
+          "mode": "single",
+          "exclusive": true,
+          "angles": [40, 50, 60, 70, 80, 90],
+          "valves": [
+            { "label": "左阀", "dir": 1 },
+            { "label": "右阀", "dir": 2 }
+          ],
+          "desc": "L型阀门：2个阀体，互斥（同时只能开启一个），开度 40/50/60/70/80/90"
+        },
+        "D_DUAL_HEAD": {
+          "name": "D型双头",
+          "mode": "multi",
+          "exclusive": false,
+          "angles": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+          "valves": [
+            { "label": "左阀", "dir": 1 },
+            { "label": "右阀", "dir": 2 }
+          ],
+          "desc": "D型双头：双阀体独立控制，开度 0~100，待补配置"
+        },
+        "D_INTEGRATED": {
+          "name": "D型一体",
+          "mode": "single",
+          "exclusive": false,
+          "angles": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+          "valves": [
+            { "label": "左阀", "dir": 1 },
+            { "label": "右阀", "dir": 2 }
+          ],
+          "desc": "D型一体：待补配置"
+        },
+        "T_VALVE": {
+          "name": "T型阀门",
+          "mode": "single",
+          "exclusive": false,
+          "angles": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+          "valves": [
+            { "label": "左阀", "dir": 1 },
+            { "label": "右阀", "dir": 2 }
+          ],
+          "desc": "T型阀门：待补配置"
+        },
+        "DUAL_HEAD": {
+          "name": "双头",
+          "mode": "multi",
+          "exclusive": false,
+          "angles": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+          "valves": [
+            { "label": "左阀", "dir": 1 },
+            { "label": "右阀", "dir": 2 }
+          ],
+          "desc": "双头：待补配置"
+        },
+        "TRIPLE_HEAD": {
+          "name": "三头",
+          "mode": "multi",
+          "exclusive": false,
+          "angles": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+          "valves": [
+            { "label": "阀1", "dir": 1 },
+            { "label": "阀2", "dir": 2 },
+            { "label": "阀3", "dir": 3 }
+          ],
+          "desc": "三头：待补配置"
+        },
+        "QUAD_HEAD": {
+          "name": "四头",
+          "mode": "multi",
+          "exclusive": false,
+          "angles": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+          "valves": [
+            { "label": "阀1", "dir": 1 },
+            { "label": "阀2", "dir": 2 },
+            { "label": "阀3", "dir": 3 },
+            { "label": "阀4", "dir": 4 }
+          ],
+          "desc": "四头：待补配置"
+        },
+        "PENTA_SINGLE": {
+          "name": "五通单",
+          "mode": "single",
+          "exclusive": false,
+          "angles": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+          "valves": [
+            { "label": "左阀", "dir": 1 },
+            { "label": "右阀", "dir": 2 }
+          ],
+          "desc": "五通单：待补配置"
+        },
+        "PENTA_DUAL": {
+          "name": "五通双",
+          "mode": "single",
+          "exclusive": false,
+          "angles": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+          "valves": [
+            { "label": "左阀", "dir": 1 },
+            { "label": "右阀", "dir": 2 }
+          ],
+          "desc": "五通双：待补配置"
+        }
+      }
+    }
+  }
+}
