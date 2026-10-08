@@ -2,9 +2,9 @@
 aep:
   ## 发送侧：REST API 调用（认证、产品映射、指令下发、设备管理）
   send:
-    app-key: IQsPnFznnO7
-    app-secret: dbwgP7q7IM
-    operator: 29000171007
+    app-key: 123456
+    app-secret: 123456
+    operator: 123456
     ttl: 60
     products:
       # 球阀 4G（MQTT）产品；设备类型枚举见 DeviceType
