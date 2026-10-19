@@ -1,9 +1,7 @@
 # Process 方式调用 Python3
 
-演示 Spring Boot 如何调用 Python3 的示例项目。
-
-早期版本使用 Jython（仅支持 Python 2 语法），现已改为通过 **ProcessBuilder 启动本机 Python3 子进程** 的方式，
-支持完整的 Python3 语法，并可直接使用 pip 安装的第三方库（如 numpy、pandas）。
+演示 Spring Boot 通过 **ProcessBuilder 启动本机 Python3 子进程** 调用 Python 脚本的示例项目。
+支持完整的 Python3 语法，可直接使用 pip 安装的第三方库（如 numpy、pandas）。
 
 ## 技术栈
 
@@ -65,7 +63,7 @@ sudo yum install -y python3
 ```yaml
 python:
   command: python        # Windows 常见；Linux/macOS 一般改为 python3
-  script-location: /py
+  script-dir: D:\xuzhihao\spring-boot2-demo\spring-boot-python\script   # 脚本目录（绝对路径）
   timeout-seconds: 10
 ```
 
@@ -74,7 +72,9 @@ python:
 ```
 spring-boot-python
 ├── pom.xml
-├── test.http                          # IDEA HTTP Client 测试脚本
+├── script
+│   └── add.py                           # 演示用 Python3 脚本（改完实时生效）
+├── test.http                            # IDEA HTTP Client 测试脚本
 └── src
     ├── main
     │   ├── java/net/xzh/python
@@ -84,9 +84,7 @@ spring-boot-python
     │   │   └── service
     │   │       └── PythonScriptService.java # ProcessBuilder 调用 Python3
     │   └── resources
-    │       ├── application.yml
-    │       └── py
-    │           └── add.py                   # 演示用 Python3 脚本
+    │       └── application.yml
     └── test
         └── java/net/xzh/python
             └── PythonApplicationTests.java
@@ -169,36 +167,20 @@ curl -X POST -d "code=def add(a, b): return a * b" "http://localhost:8080/api/py
 
 ## 实现原理
 
-1. `PythonScriptService` 将 classpath 下的脚本（如 `/py/add.py`）复制到临时文件
-2. 通过 `ProcessBuilder` 启动本机 Python3 子进程执行：`python /tmp/xxx/add.py 5 10`
-3. 读取子进程的标准输出作为接口返回值；非 0 退出码视为执行失败
+1. 根据配置 `python.script-dir` 定位脚本目录，直接加载并执行其中的脚本（如 `script/add.py`），
+   同时将子进程**工作目录**设置为脚本目录，脚本可 `import` 同目录模块、读取同目录配置文件
+2. 通过 `ProcessBuilder` 启动本机 Python3 子进程执行：`python add.py 5 10`
+3. 守护线程持续消费子进程输出（合并 stderr，防止管道堵塞），设置 UTF-8 编码环境变量防乱码
+4. 读取输出作为接口返回值；超时或非 0 退出码视为执行失败
 
-### 为什么复制到临时目录？
-
-脚本打包在 jar 内（classpath），而 Python 子进程只能读取文件系统上的真实文件，
-无法直接执行 jar 内部路径，所以需要先解压复制出来。
-
-本项目是 **demo**，重点演示"Java 如何调用 Python"。脚本随 jar 一起打包，
-可保证**代码与脚本版本一致**，部署时只有一个 jar，不依赖外部目录。
-
-### 实际生产怎么做？
-
-如果需要脚本修改后**实时生效**（如公式、模板由运营同学维护、频繁调整），
-可改为配置**外部文件路径**直接执行，无需复制到临时目录：
+脚本放在外部目录、不打包进 jar，修改脚本后**实时生效**，无需重新打包发布，
+适合公式计算、模板渲染等需要频繁调整脚本的场景。生产环境将 `script-dir` 指向服务器上的固定目录即可：
 
 ```yaml
 python:
-  # 直接指向外部脚本目录，修改脚本后无需重新打包发布
-  command: python
+  command: python3
+  script-dir: /opt/scripts   # Linux 示例；Windows 例如 D:/scripts
 ```
-
-```java
-// 生产示例：直接执行外部路径脚本
-pythonScriptService.execScript("/opt/scripts/add.py", "5", "10");
-```
-
-这样运营/算法同学改完 `add.py` 立即生效，适合公式计算、模板渲染等需要热更新的场景。
-也可以两者结合：优先读取外部目录，不存在时再 fallback 到 jar 内置脚本。
 
 ## 常见问题
 
