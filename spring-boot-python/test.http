@@ -7,7 +7,7 @@ POST http://localhost:8080/api/python/execute
 POST http://localhost:8080/api/python/compute?a=122&b=23
 
 ### 公式/模板场景：函数内容来自内存或数据库，无需落盘 .py 文件
-# 注意：body 必须是 code=xxx 的表单格式；不要在函数里用 +（form 表单会把 + 解码成空格），这里用 * 演示
+# 注意：body 必须是 code=xxx 的表单格式；不要在函数里用 +（form 表单会把 + 解码成空格），这里用 * 演示，实际从内存或者数据库中读取
 POST http://localhost:8080/api/python/compute?a=5&b=10
 Content-Type: application/x-www-form-urlencoded
 
