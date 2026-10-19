@@ -1,10 +1,14 @@
-# Python
+# Python3
 
-### 执行‌任意代码块
+### 执行 Python 代码块
 POST http://localhost:8080/api/python/execute
 
-### 直接执行表达式
-POST http://localhost:8080/api/python/eval
+### 固定函数调用（执行预置脚本 add.py）
+POST http://localhost:8080/api/python/compute?a=122&b=23
 
-### 获取函数对象，再调用
-POST http://localhost:8080/api/python/call
+### 公式/模板场景：函数内容来自内存或数据库，无需落盘 .py 文件
+# 注意：body 必须是 code=xxx 的表单格式；不要在函数里用 +（form 表单会把 + 解码成空格），这里用 * 演示
+POST http://localhost:8080/api/python/compute?a=5&b=10
+Content-Type: application/x-www-form-urlencoded
+
+code=def add(a, b): return a * b
