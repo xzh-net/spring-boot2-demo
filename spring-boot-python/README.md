@@ -120,7 +120,7 @@ mvnw.cmd spring-boot:run
 
 ### 示例
 
-#### 1. 执行代码块
+#### 1. 执行 Python 代码块
 
 ```bash
 curl -X POST http://localhost:8080/api/python/execute
@@ -135,10 +135,10 @@ curl -X POST http://localhost:8080/api/python/execute
 }
 ```
 
-#### 2. 固定函数调用（默认参数 122 + 23）
+#### 2. 固定函数调用（执行预置脚本 add.py）
 
 ```bash
-curl -X POST "http://localhost:8080/api/python/compute"
+curl -X POST "http://localhost:8080/api/python/compute?a=122&b=23"
 ```
 
 响应：
@@ -150,10 +150,10 @@ curl -X POST "http://localhost:8080/api/python/compute"
 }
 ```
 
-#### 3. 传入自定义参数（5 + 10）
+#### 3. 公式/模板场景：函数内容来自内存或数据库，无需落盘 .py 文件
 
 ```bash
-curl -X POST "http://localhost:8080/api/python/compute?a=5&b=10"
+curl -X POST -d "code=def add(a, b): return a * b" "http://localhost:8080/api/python/compute?a=5&b=10"
 ```
 
 响应：
@@ -161,22 +161,7 @@ curl -X POST "http://localhost:8080/api/python/compute?a=5&b=10"
 ```json
 {
   "success": true,
-  "result": "15"
-}
-```
-
-#### 4. 公式/模板场景：函数内容来自内存或数据库
-
-```bash
-curl -X POST --data-urlencode "code=def add(a,b): return a+b" "http://localhost:8080/api/python/compute?a=5&b=10"
-```
-
-响应：
-
-```json
-{
-  "success": true,
-  "result": "15"
+  "result": "50"
 }
 ```
 
