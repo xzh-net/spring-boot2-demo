@@ -106,8 +106,6 @@
 
 - [Jsoup HTML 解析器](spring-boot-winkawaks) — 使用 Jsoup 解析 HTML 抓取游戏 ROM 资源与图片批量处理
 
-- [Java 调用 Python](spring-boot-python) — 通过 Process/Jython/ScriptEngine 等多种方式调用 Python 脚本
-
 - [Apache Geode 内存网格](spring-boot-geode) — 使用 Apache Geode 分布式内存数据网格解决千万级 QPS 并发查询
 
 - [ELK 统一日志收集](spring-boot-elk) — 基于 Elasticsearch + Logstash + Kibana 技术栈实现微服务统一日志收集分析
@@ -143,6 +141,8 @@
 - [Collabora Online 在线文档](spring-boot-wopi) — 通过 WOPI 协议集成 Collabora Online 实现在线 Office 文档编辑
 
 - [Dify 大模型平台调用](spring-boot-dify) — 使用 Spring WebClient 调用 Dify API 接入大模型应用能力
+
+- [Java 调用 Python](spring-boot-python) — Process 方式调用 Python3
 
 ---
 
