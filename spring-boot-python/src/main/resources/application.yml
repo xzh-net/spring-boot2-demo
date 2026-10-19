@@ -4,7 +4,7 @@ server:
 python:
   # Python3 解释器命令，Windows 常见为 python，Linux/macOS 常见为 python3
   command: python
-  # Python 脚本所在目录（classpath 下的路径）
-  script-location: /py
+  # 脚本目录（绝对路径）。脚本从该目录直接加载执行，修改后实时生效，无需重新打包。
+  script-dir: D:\xuzhihao\spring-boot2-demo\spring-boot-python\script
   # 子进程执行超时时间（秒）
   timeout-seconds: 10
