@@ -1,4 +1,4 @@
-# MinIO 
+# MinIO 对象存储
 
 ## 使用 Webhook 和 AMQP 实现上传回调
 
