@@ -1,4 +1,4 @@
-# Server Sent Event
+# SSE 服务端推送
 
 SSE(Server Sent Event)，是一种可以主动从服务端推送消息的技术。SSE的本质其实就是一个HTTP的长连接，只不过它给客户端发送的不是一次性的数据包，而是一个stream流，格式为text/event-stream。所以客户端不会关闭连接，会一直等着服务器发过来的新的数据流。
 
