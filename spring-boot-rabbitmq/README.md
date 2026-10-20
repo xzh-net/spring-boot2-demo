@@ -1,4 +1,4 @@
-# spring-boot-starter-amqp
+# RabbitMQ 消息中间件
 
 ## 工作模式
 
