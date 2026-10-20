@@ -1,4 +1,4 @@
-# Quartz作业调度和自定义线程池
+# Quartz 定时任务调度
 
 > 升级spring boot > 2.5.6的版本后将不再支持JobStoreTX方式进行配置默认数据源
 
