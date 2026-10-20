@@ -1,4 +1,4 @@
-# Sharding-JDBC分库分表
+# ShardingJDBC 分库分表
 
 1. 使用取模的方式来实现表分片
 
