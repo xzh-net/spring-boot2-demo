@@ -1,4 +1,4 @@
-# SFTP文件同步
+# SFTP 文件传输
 
 Spring Integration提供了对通过SFTP进行文件传输操作的支持。
 
