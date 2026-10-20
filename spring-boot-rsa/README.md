@@ -1,4 +1,4 @@
-# RSA + AES 混合加密 Demo
+# RSA + AES 混合接口加密
 
 基于 Spring Boot 2.7.0 实现的 RSA + AES 混合加密数据传输演示项目，通过 Spring `RequestBodyAdvice` / `ResponseBodyAdvice` 切面机制实现请求解密和响应加密的透明化，业务代码无需感知加密细节。
 
