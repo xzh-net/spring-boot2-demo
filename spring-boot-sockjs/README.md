@@ -1,4 +1,4 @@
-# SockJS（传输协议） + STOMP（应用协议）+ RabbitMQ（中间件）
+# SockJS + RabbitMQ 实时聊天
 
 ## 为什么需要SockJS
 
