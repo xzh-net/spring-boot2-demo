@@ -1,4 +1,5 @@
-# RocketMq 4.9.6（SendSms）
+# RocketMQ 消息中间件
+> 依赖 RocketMQ 服务端 4.9.6
 
 ## 核心方法
 
