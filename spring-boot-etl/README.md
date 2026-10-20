@@ -1,4 +1,5 @@
-# pdi-ce-7.1.0.0-12
+# Kettle ETL 数据处理
+> 依赖 Kettle (pdi-ce) 7.1.0.0-12
 
 安装说明：https://www.xuzhihao.net/#/deploy/kettle
 
