@@ -1,4 +1,4 @@
-# 使用 Java 操作 Kubernetes API
+# Kubernetes 容器编排
 
 Java操作k8s，有官方版本和社区版本：
  - kubernetes-client/java
