@@ -1,4 +1,4 @@
-# 使用Jackson解析YAML的两种方式
+# YAML 格式校验
 
 推荐原因：Spring Boot 2.x 默认并推荐
 
