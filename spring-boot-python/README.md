@@ -1,4 +1,4 @@
-# Process 方式调用 Python3
+# Java 调用 Python
 
 演示 Spring Boot 通过 **ProcessBuilder 启动本机 Python3 子进程** 调用 Python 脚本的示例项目。
 支持完整的 Python3 语法，可直接使用 pip 安装的第三方库（如 numpy、pandas）。
