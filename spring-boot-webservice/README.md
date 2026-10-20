@@ -1,4 +1,4 @@
-# Web Service
+# CXF WebService 服务
 
 
 1. 通过@EnableWs注解触发扫描，扫描指定包下被@Service注解的类，并解析其中被@SoapMapping注解的方法，将funcId与对应的Bean和方法信息映射关系缓存起来（在WsComponentScanRegistrar中完成）。
