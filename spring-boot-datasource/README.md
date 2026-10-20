@@ -1,4 +1,4 @@
-# 多数据源切换
+# 多数据源动态切换
 
 dynamic-datasource-spring-boot-starter注解实现自动切换
 
