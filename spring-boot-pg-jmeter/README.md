@@ -1,4 +1,4 @@
-# postgres百万性能查询调优
+# PostgreSQL 性能调优
 
 ## 1. 表结构
 
