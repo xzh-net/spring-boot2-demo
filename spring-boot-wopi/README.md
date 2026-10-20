@@ -1,4 +1,4 @@
-# SpringBoot 集成 Collabora Online 实现在线文档编辑
+# Collabora Online 在线文档
 
 - 官网地址: https://www.collaboraoffice.com/
 - SDK地址: https://sdk.collaboraonline.com/
