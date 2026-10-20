@@ -1,4 +1,4 @@
-# HBase 2.4.11
+# HBase 列式数据库
 
 连接2.4.11测试正常，也可以连接docker版本harisekhon/hbase:2.1测试
 
