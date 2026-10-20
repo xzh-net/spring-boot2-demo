@@ -1,4 +1,4 @@
-# Spring Boot整合ActiveMQ
+# ActiveMQ 消息队列
 
 JMS (Java Message Service) JAVA消息服务，基于JVM消息的规范。ActiveMQ、HornetMQ是JMS实现。
 
