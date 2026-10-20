@@ -1,4 +1,5 @@
-# Jenkins 2.464
+# Jenkins API 流水线
+> 对接 Jenkins 2.464
 
 Jenkins API总共有三种格式，分别为：JSON API、XML API、Python API。
 
