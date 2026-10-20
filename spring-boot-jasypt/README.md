@@ -1,4 +1,4 @@
-# Jasypt使用SM4加密配置文件
+# Jasypt 配置文件加密
 
 官方地址：http://www.jasypt.org/
 
