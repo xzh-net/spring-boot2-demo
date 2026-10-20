@@ -1,4 +1,5 @@
-# SpringBoot 2.7.0
+# Spring Boot 快速入门示例
+> 基于 Spring Boot 2.7.0 开发
 
 ## 主要功能
 
