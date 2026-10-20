@@ -1,4 +1,4 @@
-# Spring Boot 2.7
+# spring-boot2-demo
 
 > 标注「（含 Swagger 文档）」的项目已集成 SpringDoc/Swagger，启动后访问 swagger-ui 即可查看接口定义并在线调试
 
