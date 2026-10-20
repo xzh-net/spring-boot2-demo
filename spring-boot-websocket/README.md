@@ -1,4 +1,4 @@
-# spring-boot-websocket
+# WebSocket 长连接
 
 一个基于html5的websocket单机示例（心跳、重连）。
 
